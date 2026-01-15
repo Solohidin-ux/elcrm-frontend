@@ -1,9 +1,10 @@
 import { Layout } from '@/shared/components/Layout'
+import KanbanTable from '../components/KanbanBoard'
 
 function PrototypePage() {
 	const content = (
 		<Layout>
-			<h1>Prototype Page</h1>
+			<KanbanTable />
 		</Layout>
 	)
 
