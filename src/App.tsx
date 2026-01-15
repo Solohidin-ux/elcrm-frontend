@@ -5,8 +5,7 @@ function App() {
 	const content = (
 		<Routes>
 			<Route path='/'>
-				<Route index element={<h1 className='text-amber-700'>ГЛАВНАЯ</h1>} />
-				<Route path='prototype' element={<PrototypePage />} />
+				<Route index element={<PrototypePage />} />
 
 				{/* Редирект если 404 */}
 				<Route path='*' element={<Navigate to='/' replace />} />
