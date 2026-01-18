@@ -29,7 +29,7 @@ import {
 	initialTasks,
 	type ColumnType,
 	type Task,
-} from '../../../utils/moc-data.ts'
+} from '../../../shared/utils/moc-data.ts'
 import { ColumnContainer } from './ColumnContainer'
 import { TaskCard } from './TaskCard'
 

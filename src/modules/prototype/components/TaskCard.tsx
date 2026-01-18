@@ -6,8 +6,8 @@ import {
 	CircleDollarSign,
 	MoreHorizontal,
 } from 'lucide-react'
-import { type Task } from '../../../utils/moc-data.ts'
-import { cn } from '../../../utils/utils.ts'
+import { type Task } from '../../../shared/utils/moc-data.ts'
+import { cn } from '../../../shared/utils/utils.ts'
 
 interface TaskCardProps {
 	task: Task

@@ -4,8 +4,8 @@ import {
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
-import type { Column, Task } from '../../../utils/moc-data.ts'
-import { cn } from '../../../utils/utils.ts'
+import type { Column, Task } from '../../../shared/utils/moc-data.ts'
+import { cn } from '../../../shared/utils/utils.ts'
 import { TaskCard } from './TaskCard'
 
 interface ColumnContainerProps {
