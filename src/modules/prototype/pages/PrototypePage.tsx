@@ -1,10 +1,10 @@
 import { Layout } from '@/shared/components/Layout'
-import KanbanTable from '../components/KanbanBoard'
+import SalesFunnelBoard from '../components/KanbanBoardNew'
 
 function PrototypePage() {
 	const content = (
 		<Layout>
-			<KanbanTable />
+			<SalesFunnelBoard />
 		</Layout>
 	)
 

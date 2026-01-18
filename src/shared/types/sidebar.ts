@@ -3,3 +3,5 @@ export interface NavItem {
 	label: string
 	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
 }
+
+export type UserRole = 'owner' | 'manager' | 'guest'

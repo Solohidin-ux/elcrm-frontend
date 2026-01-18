@@ -1,17 +1,19 @@
 export const ru = {
 	sidebar: {
-		dashboard: 'Дашборд',
+		dashboard: 'Главная панель',
+		overview: 'Обзор',
+		managers: 'Менеджеры',
+		finance: 'Деньги',
+		sales: 'Продажи',
 		clients: 'Клиенты',
-		products: 'Товары/Услуги',
+		products: 'Товары',
 		funnel: 'Воронка продаж',
-		finance: 'Финансы',
 	},
 	kanban: {
-		new: 'Новая заявка',
-		negotiation: 'Переговоры',
-		decision: 'Принятие решения',
-		contract: 'Договор',
-		won: 'Успешно',
-		add_card: 'Добавить сделку',
+		columns: {
+			in_progress: 'В работе',
+			planned: 'В планах',
+			done: 'Выполнено',
+		},
 	},
 }
