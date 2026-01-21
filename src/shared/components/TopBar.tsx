@@ -38,6 +38,7 @@ import {
 	XCircle,
 } from 'lucide-react'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'message'
 
@@ -235,8 +236,15 @@ function TopBar() {
 	const [notifications, setNotifications] = useState<Notification[]>(
 		mockNotificationsData,
 	)
+	const { t, i18n } = useTranslation()
 
-	// Подсчет непрочитанных
+	const handleLanguageChange = (langCode: string) => {
+		i18n.changeLanguage(langCode)
+		setCurrentLang(
+			languages.find(lang => lang.code === langCode) || languages[0],
+		)
+	}
+
 	const unreadCount = notifications.filter(n => !n.read).length
 
 	// Функция очистки
@@ -279,7 +287,7 @@ function TopBar() {
 							{languages.map(lang => (
 								<DropdownMenuItem
 									key={lang.code}
-									onClick={() => setCurrentLang(lang)}
+									onClick={() => handleLanguageChange(lang.code)}
 									className='flex items-center justify-between cursor-pointer py-2'
 								>
 									<span className='flex items-center gap-3'>
