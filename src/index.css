@@ -121,3 +121,19 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+.shadcn-scrollbar::-webkit-scrollbar {
+	width: 8px;
+}
+.shadcn-scrollbar::-webkit-scrollbar-track {
+	background: transparent;
+}
+.shadcn-scrollbar::-webkit-scrollbar-thumb {
+	background-color: #cbd5e1;
+	border-radius: 9999px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+.shadcn-scrollbar::-webkit-scrollbar-thumb:hover {
+	background-color: #94a3b8;
+}

@@ -4,7 +4,7 @@ export enum UrlNames {
 	CLIENTS = '/clients',
 	PRODUCTS = '/products',
 	FUNNEL = '/funnel',
-	FINANCE = '/finance',
+	FINANCES = '/finances',
 	MANAGERS = '/managers',
 	SALES = '/sales',
 }

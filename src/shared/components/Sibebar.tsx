@@ -35,7 +35,7 @@ function Sidebar() {
 						icon: UserCog,
 					},
 					{
-						href: UrlNames.FINANCE,
+						href: UrlNames.FINANCES,
 						label: t('sidebar.finance'),
 						icon: DollarSign,
 					},
@@ -64,7 +64,7 @@ function Sidebar() {
 						icon: Package,
 					},
 					{
-						href: UrlNames.FINANCE,
+						href: UrlNames.FINANCES,
 						label: t('sidebar.finance'),
 						icon: DollarSign,
 					},
@@ -85,7 +85,7 @@ function Sidebar() {
 					},
 					{ href: UrlNames.FUNNEL, label: t('sidebar.funnel'), icon: ChartPie },
 					{
-						href: UrlNames.FINANCE,
+						href: UrlNames.FINANCES,
 						label: t('sidebar.finance'),
 						icon: DollarSign,
 					},

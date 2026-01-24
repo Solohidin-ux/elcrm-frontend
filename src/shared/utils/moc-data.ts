@@ -1,8 +1,20 @@
 import type { TFunction } from 'i18next'
 
+// -----------------------------------------------------------------------------
+// TYPES DEFINITIONS
+// -----------------------------------------------------------------------------
+
+// Shared Types
 export type Id = string | number
 
+// Kanban Types
 export type ColumnType = 'planned' | 'in_progress' | 'done'
+
+export type Column = {
+	id: ColumnType
+	title: string
+	color: string
+}
 
 export type Task = {
 	id: Id
@@ -16,17 +28,39 @@ export type Task = {
 	assignee?: string
 }
 
-export type Column = {
-	id: ColumnType
-	title: string
-	color: string
+// Finance Types
+export interface IAnalytics {
+	today: number
+	month: number
+	growthDay: string
+	growthMonth: string
 }
 
-// --- MOCK DATA ---
+export interface ISeller {
+	id: number
+	name: string
+	position: string
+	totalSales: number
+	deals: number
+	avatarColor: string
+}
+
+export interface IProduct {
+	id: number
+	name: string
+	conversion: number
+	sales: number
+}
+
+// -----------------------------------------------------------------------------
+// MOCK DATA & HELPERS
+// -----------------------------------------------------------------------------
+
+// Kanban Data
 export const getInitialColumns = (t: TFunction): Column[] => [
 	{
 		id: 'planned',
-		title: t('kanban.columns.planned'), // Используем переданную функцию
+		title: t('kanban.columns.planned'),
 		color: 'bg-slate-400',
 	},
 	{
@@ -123,4 +157,28 @@ export const initialTasks: Task[] = [
 		checklist: { total: 10, completed: 2 },
 		assignee: 'D',
 	},
+]
+
+// Finance Data
+export const finance_analytics: IAnalytics = {
+	today: 145000,
+	month: 3200000,
+	growthDay: '+12%',
+	growthMonth: '+5%',
+}
+
+export const best_seller: ISeller = {
+	id: 1,
+	name: 'Алексей Смирнов',
+	position: 'Senior Manager',
+	totalSales: 1200000,
+	deals: 45,
+	avatarColor: 'bg-blue-500',
+}
+
+export const top_products: IProduct[] = [
+	{ id: 101, name: 'Premium Подписка', conversion: 24.5, sales: 150 },
+	{ id: 102, name: 'Базовый курс', conversion: 18.2, sales: 340 },
+	{ id: 103, name: 'Консультация (Час)', conversion: 12.0, sales: 85 },
+	{ id: 104, name: 'VIP Пакет', conversion: 5.8, sales: 12 },
 ]
