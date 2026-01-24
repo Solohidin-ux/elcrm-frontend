@@ -166,9 +166,6 @@ export default function SalesFunnelBoard() {
 
 	return (
 		<div className='h-screen flex flex-col text-slate-900 overflow-hidden'>
-			{/* 
-         ГЛОБАЛЬНЫЕ СТИЛИ ДЛЯ СКРОЛЛБАРА (Shadcn-like) 
-      */}
 			<style>{`
         .shadcn-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -189,7 +186,6 @@ export default function SalesFunnelBoard() {
 
 			<div className='flex-none pb-4 flex items-center justify-between border-b border-slate-100'>
 				<h1 className='text-2xl font-bold tracking-tight text-slate-900'>
-					{/* Пример использования перевода для заголовка, если нужно */}
 					{t('kanban.title', 'Задачи проекта')}
 				</h1>
 				<button className='flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors shadow-sm'>

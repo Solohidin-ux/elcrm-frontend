@@ -18,7 +18,7 @@ function Sidebar() {
 	const { t } = useTranslation()
 	const location = useLocation()
 
-	const userRole: UserRole = 'manager'
+	const userRole: UserRole = 'guest'
 
 	const getNavItems = (role: UserRole): NavItem[] => {
 		switch (role) {

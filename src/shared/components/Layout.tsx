@@ -17,12 +17,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 			{/* Правая часть - Основной контент */}
 			<main className='flex-1 flex flex-col min-w-0 bg-slate-50/50'>
-				{/* 1. Вставляем TopBar здесь, чтобы он был сверху над контентом */}
 				<TopBar />
 
-				{/* 2. Область контента, которая будет скроллиться */}
+				{/* Область контента, которая будет скроллиться */}
 				<div className='flex-1 overflow-y-auto p-6'>
-					{children || <Outlet />}
+					<div className='bg-white shadow-sm rounded-md'>
+						{' '}
+						{children || <Outlet />}
+					</div>
 				</div>
 			</main>
 		</div>
