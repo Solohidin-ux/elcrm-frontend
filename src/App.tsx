@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ClientsPage from './modules/clients/pages/ClientsPage'
+import ProductsPage from './modules/products/pages/ProductsPage'
 import PrototypePage from './modules/prototype/pages/PrototypePage'
 import { UrlNames } from './shared/enums/UrlNames'
 
@@ -9,6 +10,7 @@ function App() {
 			<Route path='/'>
 				<Route index element={<PrototypePage />} />
 				<Route path={UrlNames.CLIENTS} element={<ClientsPage />} />
+				<Route path={UrlNames.PRODUCTS} element={<ProductsPage />} />
 
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Route>

@@ -24,7 +24,7 @@ function ClientsTopbar() {
 				<div className='relative'>
 					<Search className='absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400' />
 					<Input
-						placeholder='Search'
+						placeholder='Поиск'
 						className='h-9 w-[300px] rounded-md border border-slate-300 bg-slate-50 pl-11 text-slate-600 placeholder:text-slate-400 outline focus-visible:ring-1 shadow-none'
 					/>
 				</div>
@@ -32,18 +32,18 @@ function ClientsTopbar() {
 				<Select defaultValue='newest'>
 					<SelectTrigger className='h-11 w-auto min-w-[220px] rounded-md border border-slate-300 bg-slate-100 px-4 text-slate-600 '>
 						<div className='flex items-center gap-1'>
-							<span className='text-slate-500'>Short by :</span>
+							<span className='text-slate-500'>Сортировать :</span>
 							<span className='font-bold text-slate-900'>
 								<SelectValue />
 							</span>
 						</div>
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value='newest'>Newest</SelectItem>
-						<SelectItem value='oldest'>Oldest</SelectItem>
-						<SelectItem value='spent-desc'>High Spenders</SelectItem>
-						<SelectItem value='spent-asc'>Low Spenders</SelectItem>
-						<SelectItem value='name'>Name (A-Z)</SelectItem>
+						<SelectItem value='newest'>Сначала новые</SelectItem>
+						<SelectItem value='oldest'>Сначала старые</SelectItem>
+						<SelectItem value='spent-desc'>Больше всего потратили</SelectItem>
+						<SelectItem value='spent-asc'>Меньше всего потратили</SelectItem>
+						<SelectItem value='name'>По имени (А-Я)</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>

@@ -1,9 +1,12 @@
 import Layout from '@/shared/components/Layout'
+import ProductsTable from '../components/ProductsTable'
+import ProductsTopbar from '../components/ProductsTopbar'
 
 function ProductsPage() {
 	const content = (
 		<Layout>
-			<h1>Products Page</h1>
+			<ProductsTopbar />
+			<ProductsTable />
 		</Layout>
 	)
 
