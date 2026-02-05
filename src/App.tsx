@@ -5,6 +5,7 @@ import FinancesPage from './modules/finances/pages/FinancesPage'
 import KanbanPage from './modules/kanban/pages/KanbanPage'
 import ProductsPage from './modules/products/pages/ProductsPage'
 import PrototypePage from './modules/prototype/pages/PrototypePage'
+import SettingsPage from './modules/settings/pages/SettingsPage'
 import { UrlNames } from './shared/enums/UrlNames'
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
 				<Route path={UrlNames.PRODUCTS} element={<ProductsPage />} />
 				<Route path={UrlNames.FUNNEL} element={<KanbanPage />} />
 				<Route path={UrlNames.FINANCES} element={<FinancesPage />} />
+
+				<Route path='/settings' element={<SettingsPage />} />
 
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Route>

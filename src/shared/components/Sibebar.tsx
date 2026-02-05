@@ -96,9 +96,9 @@ function Sidebar() {
 	const navItems = getNavItems(userRole)
 
 	return (
-		<aside className='h-screen w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 z-50 sticky top-0'>
+		<aside className='h-screen w-20 bg-background border-r border-border flex flex-col items-center py-6 z-50 sticky top-0'>
 			<div className='mb-7 flex flex-col items-center justify-center text-center'>
-				<h1 className='text-md font-extrabold tracking-tighter uppercase text-slate-900 leading-none'>
+				<h1 className='text-md font-extrabold tracking-tighter uppercase leading-none'>
 					CRM
 					<span className='block text-[14px] text-orange-600'>SYSTEM</span>
 				</h1>
@@ -106,7 +106,6 @@ function Sidebar() {
 
 			<nav className='flex flex-col space-y-2 w-full px-2'>
 				{navItems.map(item => {
-					// Проверяем, активен ли текущий путь
 					const isActive = location.pathname === item.href
 
 					return (
@@ -115,13 +114,13 @@ function Sidebar() {
 								to={item.href}
 								className={`w-full p-3 rounded-lg flex justify-center items-center transition-colors ${
 									isActive
-										? 'bg-slate-800 text-white hover:bg-slate-900'
-										: 'hover:bg-gray-100 text-slate-900'
+										? 'bg-primary text-primary hover:bg-primary/90'
+										: 'hover:bg-primary/10 hover:text-accent-foreground'
 								}`}
 							>
 								<item.icon
 									className={`h-5 w-5 ${
-										isActive ? 'text-white' : 'text-slate-900'
+										isActive ? 'text-primary-foreground' : 'text-primary'
 									} transition-all`}
 								/>
 							</NavLink>

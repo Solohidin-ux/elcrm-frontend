@@ -24,10 +24,10 @@ function ProductsPagination() {
 	}
 
 	const baseBtnClass =
-		'h-8 w-8 rounded-lg border-none bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 flex items-center justify-center p-0 text-center cursor-pointer transition-colors'
+		'h-8 w-8 rounded-lg border-none bg-primary/10 text-primary hover:bg-primary/80 hover:text-white flex items-center justify-center p-0 text-center cursor-pointer transition-colors'
 
 	const activeBtnClass =
-		'h-8 w-8 rounded-lg border-none bg-slate-900 text-white hover:bg-slate-800 hover:text-white flex items-center justify-center cursor-default'
+		'h-8 w-8 rounded-lg border-none bg-primary text-white hover:bg-primary/80 hover:text-white flex items-center justify-center cursor-default'
 
 	const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
 

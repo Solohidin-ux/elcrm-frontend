@@ -39,6 +39,7 @@ import {
 } from 'lucide-react'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { NavLink } from 'react-router-dom'
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'message'
 
@@ -118,8 +119,8 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({
 	return (
 		<div
 			className={cn(
-				'flex items-start gap-4 p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer relative group',
-				!notification.read ? 'bg-slate-50' : 'bg-white',
+				'flex items-start gap-4 p-4 border-b border-border hover:bg-accent transition-colors cursor-pointer relative group',
+				!notification.read ? 'bg-accent/50' : 'bg-background',
 			)}
 		>
 			<div
@@ -136,17 +137,17 @@ const NotificationCard: React.FC<{ notification: Notification }> = ({
 				<div className='flex items-center justify-between'>
 					<p
 						className={cn(
-							'text-sm font-medium text-slate-900',
+							'text-sm font-medium',
 							!notification.read && 'font-bold',
 						)}
 					>
 						{notification.title}
 					</p>
-					<span className='text-[10px] text-slate-400 whitespace-nowrap ml-2'>
+					<span className='text-[10px] text-muted-foreground whitespace-nowrap ml-2'>
 						{notification.time}
 					</span>
 				</div>
-				<p className='text-xs text-slate-500 leading-snug line-clamp-2'>
+				<p className='text-xs text-muted-foreground leading-snug line-clamp-2'>
 					{notification.description}
 				</p>
 			</div>
@@ -178,12 +179,12 @@ const ActionBtn = React.forwardRef<HTMLDivElement, ActionBtnProps>(
 				<Button
 					variant='ghost'
 					size='icon'
-					className='h-10 w-10 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:text-slate-900 transition-colors pointer-events-none'
+					className='h-10 w-10 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:text-primary transition-colors pointer-events-none'
 				>
 					<Icon size={20} strokeWidth={2} />
 				</Button>
 				{hasBadge && badgeCount !== undefined && badgeCount > 0 && (
-					<Badge className='absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-slate-800 p-0 text-[10px] text-white border-2 border-white pointer-events-none'>
+					<Badge className='absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-primary p-0 text-[10px] text-primary-foreground border-2 border-background pointer-events-none'>
 						{badgeCount > 99 ? '99+' : badgeCount}
 					</Badge>
 				)}
@@ -251,12 +252,10 @@ function TopBar() {
 	}
 
 	return (
-		<header className='w-full h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 py-2 shadow-sm'>
+		<header className='w-full h-20 bg-background border-b border-border flex items-center justify-between px-6 py-2 shadow-sm'>
 			{/* ЛЕВАЯ ЧАСТЬ: Логотип */}
 			<div className='flex items-center gap-1'>
-				<h1 className='text-2xl font-extrabold uppercase text-slate-900'>
-					CRM
-				</h1>
+				<h1 className='text-2xl font-extrabold uppercase'>CRM</h1>
 				<span className='font-extrabold uppercase text-2xl text-orange-600'>
 					SYSTEM
 				</span>
@@ -265,11 +264,11 @@ function TopBar() {
 			{/* ЦЕНТРАЛЬНАЯ ЧАСТЬ: Поиск */}
 			<div className='flex-1 max-w-xl mx-8'>
 				<div className='relative'>
-					<Search className='absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400' />
+					<Search className='absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground' />
 					<Input
 						type='text'
-						placeholder='Search anything...'
-						className='pl-10 h-11 bg-white border-slate-200 text-slate-600 placeholder:text-slate-300 rounded-lg focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-slate-300'
+						placeholder='Поиск...'
+						className='pl-10 h-11 bg-background border-border text-muted-foreground placeholder:text-muted-foreground/50 rounded-lg focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-primary'
 					/>
 				</div>
 			</div>
@@ -290,12 +289,10 @@ function TopBar() {
 								>
 									<span className='flex items-center gap-3'>
 										{lang.flag}
-										<span className='font-medium text-slate-700'>
-											{lang.name}
-										</span>
+										<span className='font-medium'>{lang.name}</span>
 									</span>
 									{currentLang.code === lang.code && (
-										<Check size={16} className='text-slate-600' />
+										<Check size={16} className='text-primary' />
 									)}
 								</DropdownMenuItem>
 							))}
@@ -313,20 +310,20 @@ function TopBar() {
 						</SheetTrigger>
 						<SheetContent
 							side='right'
-							className='w-[400px] p-0 flex flex-col bg-white sm:max-w-md'
+							className='w-[400px] p-0 flex flex-col bg-background sm:max-w-md'
 						>
-							<SheetHeader className='px-6 py-4 border-b border-slate-100 flex flex-row items-center justify-between space-y-0'>
+							<SheetHeader className='px-6 py-4 border-b border-border flex flex-row items-center justify-between space-y-0'>
 								<div className='flex items-center gap-3'>
 									<SheetClose asChild>
 										<Button
 											variant='ghost'
 											size='icon'
-											className='-ml-2 text-slate-500 hover:text-slate-900'
+											className='-ml-2 text-muted-foreground hover:text-primary'
 										>
 											<ChevronLeft className='h-5 w-5' />
 										</Button>
 									</SheetClose>
-									<SheetTitle className='text-lg font-bold text-slate-900'>
+									<SheetTitle className='text-lg font-bold'>
 										Уведомления
 									</SheetTitle>
 								</div>
@@ -334,7 +331,7 @@ function TopBar() {
 									<Button
 										variant='link'
 										onClick={handleClearAll}
-										className='text-slate-500 font-semibold hover:text-red-600 hover:no-underline px-0 cursor-pointer transition-colors'
+										className='text-muted-foreground font-semibold hover:text-red-600 hover:no-underline px-0 cursor-pointer transition-colors'
 									>
 										Очистить все
 									</Button>
@@ -354,13 +351,11 @@ function TopBar() {
 									</div>
 								) : (
 									// EMPTY STATE
-									<div className='h-full flex flex-col items-center justify-center p-6 text-center text-slate-400'>
-										<div className='h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mb-4'>
-											<Bell className='h-10 w-10 text-slate-300 fill-slate-100' />
+									<div className='h-full flex flex-col items-center justify-center p-6 text-center text-muted-foreground'>
+										<div className='h-24 w-24 bg-accent rounded-full flex items-center justify-center mb-4'>
+											<Bell className='h-10 w-10 text-muted-foreground/50 fill-muted/20' />
 										</div>
-										<p className='text-slate-600 font-medium'>
-											Нет уведомлений
-										</p>
+										<p className='font-medium'>Нет уведомлений</p>
 										<p className='text-xs mt-1 max-w-[200px]'>
 											Когда появятся новые уведомления, вы увидите их здесь.
 										</p>
@@ -370,8 +365,8 @@ function TopBar() {
 
 							{/* Футер панели (опционально) */}
 							{notifications.length > 0 && (
-								<div className='p-4 border-t border-slate-100 bg-slate-50'>
-									<Button className='w-full bg-slate-900 hover:bg-slate-800 text-white'>
+								<div className='p-4 border-t border-border bg-accent/20'>
+									<Button className='w-full bg-primary hover:bg-primary/90 text-primary-foreground'>
 										Пометить все как прочитанные
 									</Button>
 								</div>
@@ -380,20 +375,18 @@ function TopBar() {
 					</Sheet>
 				</div>
 
-				<div className='pl-4 border-l border-slate-200'>
+				<div className='pl-4 border-l border-border'>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<button className='flex items-center gap-3 hover:opacity-80 transition-opacity outline-none text-left'>
-								<Avatar className='h-11 w-11 bg-slate-700'>
-									<AvatarFallback className='bg-slate-800 text-white font-medium text-lg'>
+								<Avatar className='h-11 w-11 bg-primary'>
+									<AvatarFallback className='bg-primary text-primary-foreground font-medium text-lg'>
 										A
 									</AvatarFallback>
 								</Avatar>
 								<div className='flex flex-col leading-tight'>
-									<span className='text-sm font-semibold text-slate-900'>
-										Admin
-									</span>
-									<span className='text-xs text-slate-400'>
+									<span className='text-sm font-semibold'>Admin</span>
+									<span className='text-xs text-muted-foreground'>
 										admin@gmail.com
 									</span>
 								</div>
@@ -416,10 +409,12 @@ function TopBar() {
 								<User className='mr-2 h-4 w-4' />
 								<span>Профиль</span>
 							</DropdownMenuItem>
-							<DropdownMenuItem className='cursor-pointer'>
-								<Settings className='mr-2 h-4 w-4' />
-								<span>Настройки</span>
-							</DropdownMenuItem>
+							<NavLink to='/settings'>
+								<DropdownMenuItem className='cursor-pointer'>
+									<Settings className='mr-2 h-4 w-4' />
+									<span>Настройки</span>
+								</DropdownMenuItem>
+							</NavLink>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem className='text-red-600 focus:text-red-600 cursor-pointer focus:bg-red-50'>
 								<LogOut className='mr-2 h-4 w-4' />

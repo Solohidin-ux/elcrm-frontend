@@ -113,6 +113,38 @@
 	--sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/* --- ТЕМЫ --- */
+
+/* --- ТЕМЫ --- */
+
+/* BLUE (Твой цвет #0F3BBF) */
+.theme-blue {
+	--primary: #0f3bbf;
+	--primary-foreground: #ffffff;
+	--ring: #0f3bbf;
+	--sidebar-primary: #0f3bbf;
+}
+.dark .theme-blue {
+	--primary: #3b66f5; /* Чуть светлее для темной темы, чтобы не сливалось */
+	--primary-foreground: 0 0% 100%;
+	--ring: #3b66f5;
+}
+
+/* ROSE (Твой цвет #FF2667) */
+.theme-rose {
+	--primary: #ff2667;
+	--primary-foreground: #ffffff;
+	--ring: #ff2667;
+	--sidebar-primary: #ff2667;
+}
+.dark .theme-rose {
+	--primary: #ff4d84; /* Чуть светлее для темной темы */
+	--primary-foreground: 0 0% 100%;
+	--ring: #ff4d84;
+}
+
+/* Оранжевый и другие можно удалить, если они не нужны */
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;

@@ -79,7 +79,7 @@ function ProductsAdd() {
 	const content = (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className='bg-slate-900 text-white hover:bg-slate-800 gap-2'>
+				<Button className='bg-primary text-white hover:bg-primary/80 gap-2 cursor-pointer'>
 					<Plus size={16} />
 					Добавить товар
 				</Button>
