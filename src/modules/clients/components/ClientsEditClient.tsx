@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -12,8 +12,8 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from '@/components/ui/dialog'
+// Используем ваши кастомные Field компоненты
 import {
 	Field,
 	FieldError,
@@ -29,33 +29,38 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { type User } from './ClientsTable'
 
+// Схема валидации
 const formSchema = z.object({
-	name: z.string().min(2, 'Имя должно быть не короче 2 символов'),
-	email: z.string().email('Введите корректный email'),
-	phone: z.string().min(10, 'Минимум 10 цифр'),
-	status: z.enum(['Active', 'Pending', 'Inactive', 'Blocked'], {
-		required_error: 'Выберите статус',
-	}),
-	source: z.enum(
-		[
-			'Google',
-			'Yandex',
-			'Social Media',
-			'Referral',
-			'Email',
-			'WhatsApp',
-			'Walk-in',
-		],
-		{
-			required_error: 'Выберите источник',
-		},
-	),
+	name: z.string().min(2, 'Минимум 2 символа'),
+	email: z.string().email('Некорректный email'),
+	phone: z.string().min(10, 'Некорректный телефон'),
+	status: z.enum(['Active', 'Pending', 'Inactive', 'Blocked'] as const),
+	source: z.enum([
+		'Google',
+		'Yandex',
+		'Social Media',
+		'Referral',
+		'Email',
+		'WhatsApp',
+		'Walk-in',
+	] as const),
 })
 
-function ClientsAddClient() {
-	const [open, setOpen] = useState(false)
+interface ClientsEditClientProps {
+	user: User | null
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	onSave: (updatedUser: User) => void
+}
 
+export function ClientsEditClient({
+	user,
+	open,
+	onOpenChange,
+	onSave,
+}: ClientsEditClientProps) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -67,53 +72,57 @@ function ClientsAddClient() {
 		},
 	})
 
-	const onSubmit = (data: z.infer<typeof formSchema>) => {
-		const newClient = {
-			...data,
-			id: `USR-${Math.floor(Math.random() * 10000)}`,
-			last_activity_at: new Date().toISOString(),
+	useEffect(() => {
+		if (user) {
+			form.reset({
+				name: user.name,
+				email: user.email,
+				phone: user.phone,
+				status: user.status,
+				source: user.source,
+			})
+		}
+	}, [user, form])
+
+	const onSubmit = (values: z.infer<typeof formSchema>) => {
+		if (!user) return
+
+		const updatedUser: User = {
+			...user,
+			...values,
 		}
 
-		console.group('🚀 Данные формы отправлены')
-		console.log('Raw Data:', data)
-		console.log('Formatted Client:', newClient)
-		console.groupEnd()
+		onSave(updatedUser)
 
-		setOpen(false)
-		form.reset()
+		toast.success('Клиент обновлен', {
+			description: `Данные для ${values.name} успешно сохранены.`,
+		})
+
+		onOpenChange(false)
 	}
 
-	const content = (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button className='bg-slate-900 text-white hover:bg-slate-800 gap-2'>
-					<Plus size={16} />
-					Добавить клиента
-				</Button>
-			</DialogTrigger>
-
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className='sm:max-w-[500px]'>
 				<DialogHeader>
-					<DialogTitle>Новый клиент</DialogTitle>
+					<DialogTitle>Редактирование клиента</DialogTitle>
 					<DialogDescription>
-						Заполните данные. Нажмите сохранить, чтобы добавить клиента.
+						Измените данные и нажмите сохранить.
 					</DialogDescription>
 				</DialogHeader>
 
-				<form id='add-client-form' onSubmit={form.handleSubmit(onSubmit)}>
+				<form id='edit-client-form' onSubmit={form.handleSubmit(onSubmit)}>
 					<FieldGroup className='gap-4'>
-						{/* --- ИМЯ --- */}
+						{/* ИМЯ */}
 						<Controller
 							name='name'
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel htmlFor='name-input'>Имя Фамилия</FieldLabel>
+									<FieldLabel>Имя Фамилия</FieldLabel>
 									<Input
 										{...field}
-										id='name-input'
-										placeholder='Александр Иванов'
-										autoComplete='name'
+										placeholder='Иван Иванов'
 										aria-invalid={fieldState.invalid}
 									/>
 									{fieldState.invalid && (
@@ -123,22 +132,15 @@ function ClientsAddClient() {
 							)}
 						/>
 
-						{/* Группировка в 2 колонки */}
 						<div className='grid grid-cols-2 gap-4'>
-							{/* --- ТЕЛЕФОН --- */}
+							{/* ТЕЛЕФОН */}
 							<Controller
 								name='phone'
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='phone-input'>Телефон</FieldLabel>
-										<Input
-											{...field}
-											id='phone-input'
-											placeholder='+7 (999)...'
-											type='tel'
-											aria-invalid={fieldState.invalid}
-										/>
+										<FieldLabel>Телефон</FieldLabel>
+										<Input {...field} aria-invalid={fieldState.invalid} />
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
 										)}
@@ -146,20 +148,14 @@ function ClientsAddClient() {
 								)}
 							/>
 
-							{/* --- EMAIL --- */}
+							{/* EMAIL */}
 							<Controller
 								name='email'
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='email-input'>Email</FieldLabel>
-										<Input
-											{...field}
-											id='email-input'
-											placeholder='mail@example.com'
-											type='email'
-											aria-invalid={fieldState.invalid}
-										/>
+										<FieldLabel>Email</FieldLabel>
+										<Input {...field} aria-invalid={fieldState.invalid} />
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
 										)}
@@ -169,7 +165,7 @@ function ClientsAddClient() {
 						</div>
 
 						<div className='grid grid-cols-2 gap-4'>
-							{/* --- СТАТУС (Select) --- */}
+							{/* СТАТУС */}
 							<Controller
 								name='status'
 								control={form.control}
@@ -179,9 +175,10 @@ function ClientsAddClient() {
 										<Select
 											onValueChange={field.onChange}
 											defaultValue={field.value}
+											value={field.value}
 										>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
-												<SelectValue placeholder='Выберите...' />
+												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
@@ -199,7 +196,7 @@ function ClientsAddClient() {
 								)}
 							/>
 
-							{/* --- ИСТОЧНИК (Select) --- */}
+							{/* ИСТОЧНИК */}
 							<Controller
 								name='source'
 								control={form.control}
@@ -209,9 +206,10 @@ function ClientsAddClient() {
 										<Select
 											onValueChange={field.onChange}
 											defaultValue={field.value}
+											value={field.value}
 										>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
-												<SelectValue placeholder='Выберите...' />
+												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
@@ -235,26 +233,12 @@ function ClientsAddClient() {
 					</FieldGroup>
 				</form>
 
-				<DialogFooter className='pt-4'>
-					<Button
-						type='button'
-						variant='outline'
-						onClick={() => {
-							form.reset()
-							setOpen(false)
-						}}
-					>
-						Отмена
-					</Button>
-					<Button type='submit' form='add-client-form'>
-						Сохранить
+				<DialogFooter>
+					<Button type='submit' form='edit-client-form'>
+						Сохранить изменения
 					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	)
-
-	return content
 }
-
-export default ClientsAddClient
