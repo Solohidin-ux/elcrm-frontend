@@ -2,7 +2,7 @@ import Layout from '@/shared/components/Layout'
 import ProductsTable from '../components/ProductsTable'
 import ProductsTopbar from '../components/ProductsTopbar'
 
-function ProductsPage() {
+function ClientsPage() {
 	const content = (
 		<Layout>
 			<ProductsTopbar />
@@ -13,4 +13,4 @@ function ProductsPage() {
 	return content
 }
 
-export default ProductsPage
+export default ClientsPage

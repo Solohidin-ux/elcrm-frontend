@@ -20,7 +20,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
-import { ClientsEditClient } from './ClientsEditClient'
+import ClientsEdit from './ClientsEdit'
 import ClientsPagination from './ClientsPagination'
 
 // --- ТИПЫ ---
@@ -134,7 +134,7 @@ function ClientsTable() {
 		}
 	}
 
-	return (
+	const content = (
 		<div className='overflow-hidden'>
 			<Table>
 				<TableHeader>
@@ -231,7 +231,7 @@ function ClientsTable() {
 
 			{users.length == 0 ? '' : <ClientsPagination />}
 
-			<ClientsEditClient
+			<ClientsEdit
 				user={editingUser}
 				open={isEditOpen}
 				onOpenChange={setIsEditOpen}
@@ -262,6 +262,8 @@ function ClientsTable() {
 			</AlertDialog>
 		</div>
 	)
+
+	return content
 }
 
 export default ClientsTable

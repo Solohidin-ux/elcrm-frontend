@@ -7,7 +7,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Filter, Search } from 'lucide-react'
-import ClientsAddClient from './ClientsAddClient'
+import ClientsAdd from './ClientsAdd'
 
 // --- Конфигурация фильтров ---
 const filtersConfig = [
@@ -38,14 +38,14 @@ const filtersConfig = [
 ]
 
 function ClientsTopbar() {
-	return (
+	const content = (
 		<div className='flex flex-col gap-4 p-4'>
 			{/* Верхняя часть: Заголовок и Кнопка добавления */}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-2xl font-bold tracking-tight text-gray-900'>
 					Список клиентов
 				</h1>
-				<ClientsAddClient />
+				<ClientsAdd />
 			</div>
 
 			{/* Нижняя часть: Поиск (слева) и Фильтры/Сортировка (справа) */}
@@ -101,6 +101,8 @@ function ClientsTopbar() {
 			</div>
 		</div>
 	)
+
+	return content
 }
 
 export default ClientsTopbar
