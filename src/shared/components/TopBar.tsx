@@ -229,8 +229,6 @@ const languages = [
 	},
 ]
 
-// --- ОСНОВНОЙ КОМПОНЕНТ ---
-
 function TopBar() {
 	const [currentLang, setCurrentLang] = useState(languages[0])
 	const [notifications, setNotifications] = useState<Notification[]>(
@@ -253,7 +251,7 @@ function TopBar() {
 	}
 
 	return (
-		<header className='w-full h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 py-2 shadow-sm'>
+		<header className='w-full h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 py-2 shadow-sm'>
 			{/* ЛЕВАЯ ЧАСТЬ: Логотип */}
 			<div className='flex items-center gap-1'>
 				<h1 className='text-2xl font-extrabold uppercase text-slate-900'>

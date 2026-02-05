@@ -20,11 +20,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 				<TopBar />
 
 				{/* Область контента, которая будет скроллиться */}
-				<div className='flex-1 overflow-y-auto p-6'>
-					<div className='bg-white shadow-sm rounded-md'>
-						{' '}
-						{children || <Outlet />}
-					</div>
+				<div className='flex-1 overflow-y-auto'>
+					<div className='bg-white p-2'>{children || <Outlet />}</div>
 				</div>
 			</main>
 		</div>
