@@ -2,19 +2,28 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import {
 	Calendar,
+	Check,
 	CheckSquare,
 	CircleDollarSign,
+	Eye,
 	MoreHorizontal,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 import { type Task } from '../../../shared/utils/moc-data.ts'
+import { UrlNames } from '../../../shared/enums/UrlNames.ts'
 import { cn } from '../../../shared/utils/utils.ts'
+
+type ChecklistItemId = string
 
 interface KanbanTaskCardProps {
 	task: Task
 	isOverlay?: boolean
+	onChecklistToggle?: (taskId: Task['id'], itemId: ChecklistItemId, done: boolean) => void
 }
 
-function KanbanTaskCard({ task, isOverlay }: KanbanTaskCardProps) {
+function KanbanTaskCard({ task, isOverlay, onChecklistToggle }: KanbanTaskCardProps) {
+	const navigate = useNavigate()
 	const {
 		setNodeRef,
 		attributes,
@@ -118,6 +127,59 @@ function KanbanTaskCard({ task, isOverlay }: KanbanTaskCardProps) {
 				</p>
 			)}
 
+			{/* Чек-лист (как в Trello) */}
+			{task.checklist.length > 0 && !isOverlay && (
+				<div className='mt-3 space-y-1.5 border-t border-slate-50 pt-3'>
+					<div className='flex items-center gap-1.5 text-[10px] text-slate-500 font-medium'>
+						<CheckSquare size={12} />
+						<span>
+							{task.checklist.filter(c => c.done).length}/{task.checklist.length}
+						</span>
+					</div>
+					<ul className='space-y-1 max-h-24 overflow-y-auto shadcn-scrollbar'>
+						{task.checklist.map(item => (
+							<li
+								key={item.id}
+								className='flex items-center gap-2 text-xs group cursor-pointer touch-auto'
+								onClick={e => {
+									e.stopPropagation()
+									e.preventDefault()
+									onChecklistToggle?.(task.id, item.id, !item.done)
+								}}
+							>
+								<span
+									className={cn(
+										'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border transition-colors',
+										item.done
+											? 'border-primary bg-primary text-primary-foreground'
+											: 'border-slate-300 bg-background',
+									)}
+								>
+									{item.done ? <Check className='h-2.5 w-2.5' strokeWidth={3} /> : null}
+								</span>
+								<span
+									className={cn(
+										'flex-1 truncate',
+										item.done && 'line-through text-slate-400',
+									)}
+								>
+									{item.text}
+								</span>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
+
+			{task.checklist.length > 0 && isOverlay && (
+				<div className='mt-3 flex items-center gap-1.5 text-[10px] text-slate-500 pt-3 border-t border-slate-50'>
+					<CheckSquare size={12} />
+					<span>
+						{task.checklist.filter(c => c.done).length}/{task.checklist.length}
+					</span>
+				</div>
+			)}
+
 			<div className='mt-4 flex items-center justify-between pt-3 border-t border-slate-50'>
 				<div className='flex items-center gap-2'>
 					<div className='flex items-center gap-1.5 rounded-md bg-slate-50 px-2 py-1 text-xs font-medium text-slate-500'>
@@ -127,18 +189,34 @@ function KanbanTaskCard({ task, isOverlay }: KanbanTaskCardProps) {
 				</div>
 
 				<div className='flex items-center gap-3'>
-					<div
-						className='flex items-center gap-1 text-[10px] text-slate-400'
-						title='Чек-лист'
-					>
-						<CheckSquare size={12} />
-						<span>
-							{task.checklist.completed}/{task.checklist.total}
-						</span>
-					</div>
+					{task.checklist.length === 0 && (
+						<div
+							className='flex items-center gap-1 text-[10px] text-slate-400'
+							title='Чек-лист'
+						>
+							<CheckSquare size={12} />
+							<span>0/0</span>
+						</div>
+					)}
 					{renderAvatar(task.assignee)}
 				</div>
 			</div>
+
+			{!isOverlay && (
+				<Button
+					variant='outline'
+					size='sm'
+					className='mt-3 w-full gap-2 h-8 text-xs cursor-pointer touch-auto'
+					onClick={e => {
+						e.stopPropagation()
+						e.preventDefault()
+						navigate(`${UrlNames.FUNNEL}/${task.id}`)
+					}}
+				>
+					<Eye size={14} />
+					Детальный просмотр
+				</Button>
+			)}
 		</div>
 	)
 

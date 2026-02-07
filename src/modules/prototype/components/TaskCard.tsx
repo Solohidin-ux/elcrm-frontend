@@ -148,7 +148,7 @@ export const TaskCard = ({ task, isOverlay }: TaskCardProps) => {
 					>
 						<CheckSquare size={12} />
 						<span>
-							{task.checklist.completed}/{task.checklist.total}
+							{task.checklist.filter(c => c.done).length}/{task.checklist.length}
 						</span>
 					</div>
 					{renderAvatar(task.assignee)}

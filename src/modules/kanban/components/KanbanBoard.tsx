@@ -16,9 +16,9 @@ import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { useKanbanTasksStore } from '@/shared/store/kanban-tasks'
 import {
 	getInitialColumns,
-	initialTasks,
 	type ColumnType,
 	type Task,
 } from '../../../shared/utils/moc-data.ts'
@@ -27,10 +27,10 @@ import KanbanTaskCard from './KanbanTaskCard.tsx'
 
 function KanbanBoard() {
 	const { t } = useTranslation()
+	const { tasks, setTasks, toggleChecklistItem } = useKanbanTasksStore()
 
 	const columns = useMemo(() => getInitialColumns(t), [t])
 
-	const [tasks, setTasks] = useState<Task[]>(initialTasks)
 	const [activeTask, setActiveTask] = useState<Task | null>(null)
 
 	const sensors = useSensors(
@@ -164,6 +164,7 @@ function KanbanBoard() {
 							key={col.id}
 							column={col}
 							tasks={tasks.filter(t => t.status === col.id)}
+							onChecklistToggle={toggleChecklistItem}
 						/>
 					))}
 				</div>

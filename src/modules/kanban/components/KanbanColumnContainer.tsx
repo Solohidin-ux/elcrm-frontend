@@ -8,12 +8,15 @@ import type { Column, Task } from '../../../shared/utils/moc-data.ts'
 import { cn } from '../../../shared/utils/utils.ts'
 import KanbanTaskCard from './KanbanTaskCard.tsx'
 
+type ChecklistItemId = string
+
 interface KanbanColumnContainerProps {
 	column: Column
 	tasks: Task[]
+	onChecklistToggle: (taskId: Task['id'], itemId: ChecklistItemId, done: boolean) => void
 }
 
-function KanbanColumnContainer({ column, tasks }: KanbanColumnContainerProps) {
+function KanbanColumnContainer({ column, tasks, onChecklistToggle }: KanbanColumnContainerProps) {
 	const { setNodeRef } = useSortable({
 		id: column.id,
 		data: {
@@ -48,7 +51,11 @@ function KanbanColumnContainer({ column, tasks }: KanbanColumnContainerProps) {
 					strategy={verticalListSortingStrategy}
 				>
 					{tasks.map(task => (
-						<KanbanTaskCard key={task.id} task={task} />
+						<KanbanTaskCard
+							key={task.id}
+							task={task}
+							onChecklistToggle={onChecklistToggle}
+						/>
 					))}
 				</SortableContext>
 

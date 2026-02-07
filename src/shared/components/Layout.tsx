@@ -19,7 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 			<main className='flex-1 flex flex-col min-w-0 bg-slate-50/50'>
 				<TopBar />
 
-				{/* Область контента, которая будет скроллиться */}
+				{/* Область контента,dmdmdmdm которая будет скроллиться */}
 				<div className='flex-1 overflow-y-auto'>
 					<div className='bg-white p-2'>{children || <Outlet />}</div>
 				</div>
