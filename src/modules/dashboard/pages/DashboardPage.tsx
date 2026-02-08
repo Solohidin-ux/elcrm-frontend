@@ -1,13 +1,14 @@
 import Layout from '@/shared/components/Layout'
+import { useState } from 'react'
+import DashboardManagerPage from './DashboardManagerPage'
+import DashboardOwnerPage from './DashboardOwnerPage'
 
-function DashboardPage() {
-	const content = (
-		<Layout>
-			<h1>Dashboard Page</h1>
+export default function DashboardPage() {
+	const [role, setRole] = useState<'owner' | 'manager'>('owner')
+
+	return (
+		<Layout className='p-4'>
+			{role === 'owner' ? <DashboardOwnerPage /> : <DashboardManagerPage />}
 		</Layout>
 	)
-
-	return content
 }
-
-export default DashboardPage
