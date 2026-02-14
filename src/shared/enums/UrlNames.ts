@@ -7,4 +7,6 @@ export enum UrlNames {
 	FINANCES = '/finances',
 	MANAGERS = '/managers',
 	SALES = '/sales',
+
+	SEARCH = '/search',
 }
