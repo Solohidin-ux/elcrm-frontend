@@ -11,9 +11,11 @@ export const en = {
 	},
 	kanban: {
 		columns: {
-			in_progress: 'In Progress',
-			planned: 'Planned',
-			done: 'Done',
+			new: 'New',
+			contacted: 'Contacted',
+			agreed: 'Agreed',
+			bought: 'Bought',
+			refused: 'Refused',
 		},
 	},
 }

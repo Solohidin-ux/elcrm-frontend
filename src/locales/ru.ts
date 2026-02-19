@@ -11,9 +11,11 @@ export const ru = {
 	},
 	kanban: {
 		columns: {
-			in_progress: 'В работе',
-			planned: 'В планах',
-			done: 'Выполнено',
+			new: 'Новый',
+			contacted: 'Связались',
+			agreed: 'Договорились',
+			bought: 'Купил',
+			refused: 'Отказ',
 		},
 	},
 }

@@ -11,9 +11,11 @@ export const kg = {
 	},
 	kanban: {
 		columns: {
-			in_progress: 'Аткарылууда',
-			planned: 'Пландаштырылган',
-			done: 'Аткарылды',
+			new: 'Жаңы',
+			contacted: 'Байланышты',
+			agreed: 'Макулдашты',
+			bought: 'Сатып алды',
+			refused: 'Баш тартты',
 		},
 	},
 }

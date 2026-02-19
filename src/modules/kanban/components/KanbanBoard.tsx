@@ -23,11 +23,13 @@ import {
 	type Task,
 } from '../../../shared/utils/moc-data.ts'
 import KanbanColumnContainer from './KanbanColumnContainer.tsx'
+import KanbanEditTask from './KanbanEditTask.tsx'
 import KanbanTaskCard from './KanbanTaskCard.tsx'
 
 function KanbanBoard() {
 	const { t } = useTranslation()
-	const { tasks, setTasks, toggleChecklistItem } = useKanbanTasksStore()
+	const { tasks, setTasks, toggleChecklistItem, updateTask } = useKanbanTasksStore()
+	const [editingTask, setEditingTask] = useState<Task | null>(null)
 
 	const columns = useMemo(() => getInitialColumns(t), [t])
 
@@ -165,6 +167,7 @@ function KanbanBoard() {
 							column={col}
 							tasks={tasks.filter(t => t.status === col.id)}
 							onChecklistToggle={toggleChecklistItem}
+							onEdit={setEditingTask}
 						/>
 					))}
 				</div>
@@ -173,6 +176,13 @@ function KanbanBoard() {
 					{activeTask ? <KanbanTaskCard task={activeTask} isOverlay /> : null}
 				</DragOverlay>
 			</DndContext>
+
+			<KanbanEditTask
+				task={editingTask}
+				open={!!editingTask}
+				onOpenChange={open => !open && setEditingTask(null)}
+				onSave={updateTask}
+			/>
 		</div>
 	)
 

@@ -7,6 +7,8 @@ import {
 	CircleDollarSign,
 	Eye,
 	MoreHorizontal,
+	Package,
+	Pencil,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -20,9 +22,10 @@ interface KanbanTaskCardProps {
 	task: Task
 	isOverlay?: boolean
 	onChecklistToggle?: (taskId: Task['id'], itemId: ChecklistItemId, done: boolean) => void
+	onEdit?: (task: Task) => void
 }
 
-function KanbanTaskCard({ task, isOverlay, onChecklistToggle }: KanbanTaskCardProps) {
+function KanbanTaskCard({ task, isOverlay, onChecklistToggle, onEdit }: KanbanTaskCardProps) {
 	const navigate = useNavigate()
 	const {
 		setNodeRef,
@@ -96,9 +99,24 @@ function KanbanTaskCard({ task, isOverlay, onChecklistToggle }: KanbanTaskCardPr
 					<h3 className='text-sm font-semibold text-slate-800 leading-tight'>
 						{task.title}
 					</h3>
-					<button className='text-slate-400 hover:text-slate-600 cursor-pointer'>
-						<MoreHorizontal size={16} />
-					</button>
+					<div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
+						{onEdit && !isOverlay && (
+							<button
+								className='p-1.5 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-md transition-colors cursor-pointer touch-auto'
+								onClick={e => {
+									e.stopPropagation()
+									e.preventDefault()
+									onEdit(task)
+								}}
+								title='Редактировать'
+							>
+								<Pencil size={14} />
+							</button>
+						)}
+						<button className='p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-md transition-colors cursor-pointer'>
+							<MoreHorizontal size={16} />
+						</button>
+					</div>
 				</div>
 
 				<div className='flex flex-wrap gap-2'>
@@ -125,6 +143,27 @@ function KanbanTaskCard({ task, isOverlay, onChecklistToggle }: KanbanTaskCardPr
 				<p className='mt-3 line-clamp-2 text-xs text-slate-500'>
 					{task.description}
 				</p>
+			)}
+
+			{/* Товары */}
+			{task.products && task.products.length > 0 && (
+				<div className='mt-3 space-y-1.5 border-t border-slate-50 pt-3'>
+					<div className='flex items-center gap-1.5 text-[10px] text-slate-500 font-medium'>
+						<Package size={12} />
+						<span>Товары ({task.products.length})</span>
+					</div>
+					<div className='flex flex-wrap gap-1.5'>
+						{task.products.map(product => (
+							<span
+								key={product.id}
+								className='inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200'
+								title={product.name}
+							>
+								{product.name}
+							</span>
+						))}
+					</div>
+				</div>
 			)}
 
 			{/* Чек-лист (как в Trello) */}

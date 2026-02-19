@@ -31,7 +31,7 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 	const [title, setTitle] = useState('')
 	const [budget, setBudget] = useState('')
 	const [priority, setPriority] = useState<Task['priority']>('medium')
-	const [status, setStatus] = useState<ColumnType>('planned')
+	const [status, setStatus] = useState<ColumnType>('new')
 	const [description, setDescription] = useState('')
 	const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([])
 	const [newItemText, setNewItemText] = useState('')
@@ -78,7 +78,7 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 		setTitle('')
 		setBudget('')
 		setPriority('medium')
-		setStatus('planned')
+		setStatus('new')
 		setDescription('')
 		setChecklistItems([])
 		setNewItemText('')
@@ -89,7 +89,7 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 			setTitle('')
 			setBudget('')
 			setPriority('medium')
-			setStatus('planned')
+			setStatus('new')
 			setDescription('')
 			setChecklistItems([])
 			setNewItemText('')
@@ -163,9 +163,11 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 								</SelectTrigger>
 								<SelectContent>
 									<SelectGroup>
-										<SelectItem value='planned'>В планах</SelectItem>
-										<SelectItem value='in_progress'>В работе</SelectItem>
-										<SelectItem value='done'>Готово</SelectItem>
+										<SelectItem value='new'>Новый</SelectItem>
+										<SelectItem value='contacted'>Связались</SelectItem>
+										<SelectItem value='agreed'>Договорились</SelectItem>
+										<SelectItem value='bought'>Купил</SelectItem>
+										<SelectItem value='refused'>Отказ</SelectItem>
 									</SelectGroup>
 								</SelectContent>
 							</Select>
