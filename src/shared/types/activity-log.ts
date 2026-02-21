@@ -41,39 +41,14 @@ export interface ActivityLog {
 	metadata?: Record<string, unknown>
 }
 
-// Конфигурация типов логов
-export const activityLogTypeConfig: Record<
-	ActivityLogType,
-	{ label: string; icon: string }
-> = {
-	client_created: { label: 'Клиент создан', icon: 'UserPlus' },
-	client_updated: { label: 'Клиент обновлен', icon: 'UserCog' },
-	client_deleted: { label: 'Клиент удален', icon: 'UserMinus' },
-	client_archived: { label: 'Клиент в архиве', icon: 'Archive' },
-	client_restored: { label: 'Клиент восстановлен', icon: 'ArchiveRestore' },
-	client_status_changed: { label: 'Статус клиента изменен', icon: 'RefreshCw' },
-	client_manager_assigned: { label: 'Менеджер назначен', icon: 'UserCheck' },
-	deal_created: { label: 'Сделка создана', icon: 'Plus' },
-	deal_status_changed: { label: 'Статус сделки изменен', icon: 'ArrowRight' },
-	deal_product_added: { label: 'Товар добавлен', icon: 'Package' },
-	deal_reminder_set: { label: 'Напоминание установлено', icon: 'Bell' },
-	deal_refused: { label: 'Сделка в отказе', icon: 'X' },
-	deal_sold: { label: 'Сделка закрыта', icon: 'Check' },
-	call_made: { label: 'Звонок', icon: 'Phone' },
-	message_sent: { label: 'Сообщение', icon: 'MessageCircle' },
-	note_added: { label: 'Заметка добавлена', icon: 'FileText' },
-	reminder_added: { label: 'Напоминание', icon: 'Bell' },
-	custom: { label: 'Действие', icon: 'Activity' },
-}
-
-// Конфигурация модулей
+// Конфигурация модулей (только цвета, метки берутся из i18n)
 export const activityLogModuleConfig: Record<
 	ActivityLogModule,
-	{ label: string; color: string }
+	{ color: string }
 > = {
-	clients: { label: 'Клиенты', color: 'bg-blue-100 text-blue-700' },
-	deals: { label: 'Сделки', color: 'bg-green-100 text-green-700' },
-	products: { label: 'Товары', color: 'bg-purple-100 text-purple-700' },
-	finances: { label: 'Финансы', color: 'bg-yellow-100 text-yellow-700' },
-	system: { label: 'Система', color: 'bg-slate-100 text-slate-700' },
+	clients: { color: 'bg-blue-100 text-blue-700' },
+	deals: { color: 'bg-green-100 text-green-700' },
+	products: { color: 'bg-purple-100 text-purple-700' },
+	finances: { color: 'bg-yellow-100 text-yellow-700' },
+	system: { color: 'bg-slate-100 text-slate-700' },
 }

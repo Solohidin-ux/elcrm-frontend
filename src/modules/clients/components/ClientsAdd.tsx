@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -9,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -55,6 +55,7 @@ const formSchema = z.object({
 })
 
 function ClientsAdd() {
+	const { t } = useTranslation()
 	const [open, setOpen] = useState(false)
 	const { addClient } = useClientsStore()
 
@@ -66,7 +67,7 @@ function ClientsAdd() {
 			phone: '',
 			status: 'active',
 			source: 'Walk-in',
-			managerId: '',
+			managerId: 'not_assigned',
 		},
 	})
 
@@ -79,12 +80,15 @@ function ClientsAdd() {
 			phone: data.phone,
 			status: data.status,
 			source: data.source,
-			managerId: data.managerId || undefined,
+			managerId:
+				data.managerId && data.managerId !== 'not_assigned'
+					? data.managerId
+					: undefined,
 			managerName: selectedManager?.name || undefined,
 			lastContactAt: new Date().toISOString(),
 		})
 
-		toast.success('Клиент добавлен', {
+		toast.success(t('clients.clientAdded'), {
 			description: `${data.name} успешно добавлен в список клиентов.`,
 		})
 
@@ -92,38 +96,18 @@ function ClientsAdd() {
 		form.reset()
 	}
 
-	const statusLabels: Record<ClientStatus, string> = {
-		active: 'Активный',
-		pending: 'Ожидает',
-		in_progress: 'В процессе',
-		archived: 'Архив',
-	}
-
-	const sourceLabels: Record<ClientSource, string> = {
-		Google: 'Google',
-		Yandex: 'Yandex',
-		WhatsApp: 'WhatsApp',
-		'Social Media': 'Соцсети',
-		'Walk-in': 'Пришел сам',
-		Referral: 'Рекомендация',
-		Email: 'Email',
-	}
-
 	const content = (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
 				<Button className='bg-primary text-white hover:bg-primary/80 gap-2 cursor-pointer'>
 					<Plus size={16} />
-					Добавить клиента
+					{t('clients.addClient')}
 				</Button>
 			</DialogTrigger>
 
 			<DialogContent className='sm:max-w-[500px]'>
 				<DialogHeader>
-					<DialogTitle>Новый клиент</DialogTitle>
-					<DialogDescription>
-						Заполните данные. Нажмите сохранить, чтобы добавить клиента.
-					</DialogDescription>
+					<DialogTitle>{t('clients.newClient')}</DialogTitle>
 				</DialogHeader>
 
 				<form id='add-client-form' onSubmit={form.handleSubmit(onSubmit)}>
@@ -134,11 +118,13 @@ function ClientsAdd() {
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel htmlFor='name-input'>Имя Фамилия</FieldLabel>
+									<FieldLabel htmlFor='name-input'>
+										{t('clients.form.name')}
+									</FieldLabel>
 									<Input
 										{...field}
 										id='name-input'
-										placeholder='Александр Иванов'
+										placeholder={t('clients.form.namePlaceholder')}
 										autoComplete='name'
 										aria-invalid={fieldState.invalid}
 									/>
@@ -157,11 +143,13 @@ function ClientsAdd() {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='phone-input'>Телефон</FieldLabel>
+										<FieldLabel htmlFor='phone-input'>
+											{t('clients.form.phone')}
+										</FieldLabel>
 										<Input
 											{...field}
 											id='phone-input'
-											placeholder='+7 (999)...'
+											placeholder={t('clients.form.phonePlaceholder')}
 											type='tel'
 											aria-invalid={fieldState.invalid}
 										/>
@@ -178,11 +166,13 @@ function ClientsAdd() {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor='email-input'>Email</FieldLabel>
+										<FieldLabel htmlFor='email-input'>
+											{t('clients.form.email')}
+										</FieldLabel>
 										<Input
 											{...field}
 											id='email-input'
-											placeholder='mail@example.com'
+											placeholder={t('clients.form.emailPlaceholder')}
 											type='email'
 											aria-invalid={fieldState.invalid}
 										/>
@@ -201,20 +191,25 @@ function ClientsAdd() {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel>Статус</FieldLabel>
+										<FieldLabel>{t('clients.table.status')}</FieldLabel>
 										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue placeholder='Выберите...' />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{(Object.keys(statusLabels) as ClientStatus[]).map(
-														status => (
-															<SelectItem key={status} value={status}>
-																{statusLabels[status]}
-															</SelectItem>
-														),
-													)}
+													{(
+														[
+															'active',
+															'pending',
+															'in_progress',
+															'archived',
+														] as ClientStatus[]
+													).map(status => (
+														<SelectItem key={status} value={status}>
+															{t(`clients.statuses.${status}`)}
+														</SelectItem>
+													))}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -231,20 +226,28 @@ function ClientsAdd() {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel>Источник</FieldLabel>
+										<FieldLabel>{t('clients.form.source')}</FieldLabel>
 										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue placeholder='Выберите...' />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{(Object.keys(sourceLabels) as ClientSource[]).map(
-														source => (
-															<SelectItem key={source} value={source}>
-																{sourceLabels[source]}
-															</SelectItem>
-														),
-													)}
+													{(
+														[
+															'Google',
+															'Yandex',
+															'WhatsApp',
+															'Social Media',
+															'Walk-in',
+															'Referral',
+															'Email',
+														] as ClientSource[]
+													).map(source => (
+														<SelectItem key={source} value={source}>
+															{t(`clients.sources.${source}`)}
+														</SelectItem>
+													))}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -262,14 +265,21 @@ function ClientsAdd() {
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel>Ответственный менеджер</FieldLabel>
-									<Select onValueChange={field.onChange} value={field.value}>
+									<FieldLabel>{t('clients.form.manager')}</FieldLabel>
+									<Select
+										onValueChange={field.onChange}
+										value={field.value || undefined}
+									>
 										<SelectTrigger aria-invalid={fieldState.invalid}>
-											<SelectValue placeholder='Выберите менеджера' />
+											<SelectValue
+												placeholder={t('clients.form.selectManager')}
+											/>
 										</SelectTrigger>
 										<SelectContent>
 											<SelectGroup>
-												<SelectItem value=''>Не назначен</SelectItem>
+												<SelectItem value='not_assigned'>
+													{t('clients.form.noManager')}
+												</SelectItem>
 												{managers.map(manager => (
 													<SelectItem key={manager.id} value={manager.id}>
 														{manager.name}
@@ -296,10 +306,10 @@ function ClientsAdd() {
 							setOpen(false)
 						}}
 					>
-						Отмена
+						{t('common.cancel')}
 					</Button>
 					<Button type='submit' form='add-client-form'>
-						Сохранить
+						{t('clients.form.save')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

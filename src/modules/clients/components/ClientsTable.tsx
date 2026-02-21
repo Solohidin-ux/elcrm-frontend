@@ -1,5 +1,6 @@
 import { Archive, ArchiveRestore, Eye, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -25,11 +26,16 @@ import {
 } from '@/components/ui/table'
 import { UrlNames } from '@/shared/enums/UrlNames'
 import { useClientsStore } from '@/shared/store/clients-store'
-import { clientStatusConfig, type Client } from '@/shared/types/client'
+import {
+	clientStatusConfig,
+	type Client,
+	type ClientStatus,
+} from '@/shared/types/client'
 import ClientsEdit from './ClientsEdit'
 import ClientsPagination from './ClientsPagination'
 
 function ClientsTable() {
+	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const { filteredClients, deleteClient, moveToArchive, restoreFromArchive } =
 		useClientsStore()
@@ -53,6 +59,10 @@ function ClientsTable() {
 		})
 	}
 
+	const getStatusLabel = (status: ClientStatus) => {
+		return t(`clients.statuses.${status}`)
+	}
+
 	const handleEditClick = (client: Client) => {
 		setEditingClient(client)
 		setIsEditOpen(true)
@@ -65,8 +75,8 @@ function ClientsTable() {
 	const confirmDelete = () => {
 		if (deleteId) {
 			deleteClient(deleteId)
-			toast('Клиент удален', {
-				description: 'Запись была успешно удалена из таблицы.',
+			toast(t('clients.clientDeleted'), {
+				description: t('clients.deleteConfirm'),
 			})
 			setDeleteId(null)
 		}
@@ -79,9 +89,12 @@ function ClientsTable() {
 
 	const confirmArchive = () => {
 		if (archiveId) {
-			moveToArchive(archiveId, archiveReason || 'Нет причины')
-			toast('Клиент в архиве', {
-				description: 'Клиент был перемещен в архив.',
+			moveToArchive(
+				archiveId,
+				archiveReason || t('clients.archiveReasonPlaceholder'),
+			)
+			toast(t('clients.clientArchived'), {
+				description: t('clients.archiveConfirm'),
 			})
 			setArchiveId(null)
 			setArchiveReason('')
@@ -90,8 +103,8 @@ function ClientsTable() {
 
 	const handleRestoreClick = (id: string) => {
 		restoreFromArchive(id)
-		toast('Клиент восстановлен', {
-			description: 'Клиент был восстановлен из архива.',
+		toast(t('clients.clientRestored'), {
+			description: t('clients.archiveConfirm'),
 		})
 	}
 
@@ -104,13 +117,23 @@ function ClientsTable() {
 			<Table>
 				<TableHeader>
 					<TableRow className='text-slate-400 h-12'>
-						<TableHead className='text-slate-600'>Клиент</TableHead>
-						<TableHead className='text-slate-600'>Телефон</TableHead>
-						<TableHead className='text-slate-600'>Менеджер</TableHead>
-						<TableHead className='text-slate-600'>Статус</TableHead>
-						<TableHead className='text-slate-600'>Последний контакт</TableHead>
+						<TableHead className='text-slate-600'>
+							{t('clients.table.client')}
+						</TableHead>
+						<TableHead className='text-slate-600'>
+							{t('clients.table.phone')}
+						</TableHead>
+						<TableHead className='text-slate-600'>
+							{t('clients.table.manager')}
+						</TableHead>
+						<TableHead className='text-slate-600'>
+							{t('clients.table.status')}
+						</TableHead>
+						<TableHead className='text-slate-600'>
+							{t('clients.table.lastContact')}
+						</TableHead>
 						<TableHead className='text-slate-600 text-right'>
-							Действия
+							{t('clients.table.actions')}
 						</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -121,7 +144,7 @@ function ClientsTable() {
 								colSpan={6}
 								className='h-24 text-center text-slate-500'
 							>
-								Данных не найдено
+								{t('clients.noData')}
 							</TableCell>
 						</TableRow>
 					) : (
@@ -158,7 +181,9 @@ function ClientsTable() {
 											</span>
 										</div>
 									) : (
-										<span className='text-sm text-slate-400'>Не назначен</span>
+										<span className='text-sm text-slate-400'>
+											{t('clients.form.noManager')}
+										</span>
 									)}
 								</TableCell>
 
@@ -167,7 +192,7 @@ function ClientsTable() {
 										variant='secondary'
 										className={clientStatusConfig[client.status].className}
 									>
-										{clientStatusConfig[client.status].label}
+										{getStatusLabel(client.status)}
 									</Badge>
 								</TableCell>
 
@@ -182,7 +207,7 @@ function ClientsTable() {
 											variant='ghost'
 											size='icon-sm'
 											onClick={() => handleViewHistory(client.id)}
-											title='История действий'
+											title={t('clients.viewHistory')}
 											className='text-slate-400 hover:text-blue-600'
 										>
 											<Eye className='h-4 w-4' />
@@ -194,7 +219,7 @@ function ClientsTable() {
 												variant='ghost'
 												size='icon-sm'
 												onClick={() => handleRestoreClick(client.id)}
-												title='Восстановить'
+												title={t('clients.restore')}
 												className='text-slate-400 hover:text-green-600'
 											>
 												<ArchiveRestore className='h-4 w-4' />
@@ -206,7 +231,7 @@ function ClientsTable() {
 													variant='ghost'
 													size='icon-sm'
 													onClick={() => handleEditClick(client)}
-													title='Редактировать'
+													title={t('clients.edit')}
 													className='text-slate-400 hover:text-blue-600'
 												>
 													<Pencil className='h-4 w-4' />
@@ -217,7 +242,7 @@ function ClientsTable() {
 													variant='ghost'
 													size='icon-sm'
 													onClick={() => handleArchiveClick(client.id)}
-													title='В архив'
+													title={t('clients.toArchive')}
 													className='text-slate-400 hover:text-orange-600'
 												>
 													<Archive className='h-4 w-4' />
@@ -228,7 +253,7 @@ function ClientsTable() {
 													variant='ghost'
 													size='icon-sm'
 													onClick={() => handleDeleteClick(client.id)}
-													title='Удалить'
+													title={t('clients.delete')}
 													className='text-slate-400 hover:text-red-600'
 												>
 													<Trash2 className='h-4 w-4' />
@@ -259,19 +284,18 @@ function ClientsTable() {
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Удалить клиента?</AlertDialogTitle>
+						<AlertDialogTitle>{t('clients.deleteClient')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							Это действие нельзя отменить. Клиент будет полностью удален из
-							системы.
+							{t('clients.deleteConfirm')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Отмена</AlertDialogCancel>
+						<AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={confirmDelete}
 							className='bg-red-600 hover:bg-red-700'
 						>
-							Удалить
+							{t('common.delete')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
@@ -284,17 +308,17 @@ function ClientsTable() {
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Переместить в архив?</AlertDialogTitle>
+						<AlertDialogTitle>{t('clients.archiveClient')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							Клиент будет перемещен в архив. Вы сможете восстановить его позже.
+							{t('clients.archiveConfirm')}
 							<div className='mt-3'>
 								<label className='text-sm font-medium text-slate-700'>
-									Причина (опционально):
+									{t('clients.archiveReason')}
 								</label>
 								<textarea
 									value={archiveReason}
 									onChange={e => setArchiveReason(e.target.value)}
-									placeholder='Например: Нет активности более 30 дней'
+									placeholder={t('clients.archiveReasonPlaceholder')}
 									className='mt-1 w-full rounded-md border border-slate-300 p-2 text-sm resize-none'
 									rows={2}
 								/>
@@ -302,9 +326,9 @@ function ClientsTable() {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Отмена</AlertDialogCancel>
+						<AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
 						<AlertDialogAction onClick={confirmArchive}>
-							В архив
+							{t('clients.toArchive')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

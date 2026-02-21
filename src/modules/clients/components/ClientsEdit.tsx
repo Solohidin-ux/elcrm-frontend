@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -8,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -62,6 +62,7 @@ interface ClientsEditProps {
 }
 
 function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
+	const { t } = useTranslation()
 	const { updateClient } = useClientsStore()
 
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -85,7 +86,7 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 				phone: client.phone,
 				status: client.status,
 				source: client.source,
-				managerId: client.managerId || '',
+				managerId: client.managerId || 'not_assigned',
 				managerName: client.managerName || '',
 			})
 		}
@@ -99,41 +100,25 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 
 		updateClient(client.id, {
 			...values,
+			managerId:
+				values.managerId && values.managerId !== 'not_assigned'
+					? values.managerId
+					: undefined,
 			managerName: selectedManager?.name || values.managerName,
 		})
 
-		toast.success('Клиент обновлен', {
-			description: `Данные для ${values.name} успешно сохранены.`,
+		toast.success(t('clients.clientUpdated'), {
+			description: `${values.name} успешно сохранены.`,
 		})
 
 		onOpenChange(false)
-	}
-
-	const statusLabels: Record<ClientStatus, string> = {
-		active: 'Активный',
-		pending: 'Ожидает',
-		in_progress: 'В процессе',
-		archived: 'Архив',
-	}
-
-	const sourceLabels: Record<ClientSource, string> = {
-		Google: 'Google',
-		Yandex: 'Yandex',
-		WhatsApp: 'WhatsApp',
-		'Social Media': 'Соцсети',
-		'Walk-in': 'Пришел сам',
-		Referral: 'Рекомендация',
-		Email: 'Email',
 	}
 
 	const content = (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className='sm:max-w-[500px]'>
 				<DialogHeader>
-					<DialogTitle>Редактирование клиента</DialogTitle>
-					<DialogDescription>
-						Измените данные и нажмите сохранить.
-					</DialogDescription>
+					<DialogTitle>{t('clients.editClient')}</DialogTitle>
 				</DialogHeader>
 
 				<form id='edit-client-form' onSubmit={form.handleSubmit(onSubmit)}>
@@ -144,10 +129,10 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel>Имя Фамилия</FieldLabel>
+									<FieldLabel>{t('clients.form.name')}</FieldLabel>
 									<Input
 										{...field}
-										placeholder='Иван Иванов'
+										placeholder={t('clients.form.namePlaceholder')}
 										aria-invalid={fieldState.invalid}
 									/>
 									{fieldState.invalid && (
@@ -164,7 +149,7 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel>Телефон</FieldLabel>
+										<FieldLabel>{t('clients.form.phone')}</FieldLabel>
 										<Input {...field} aria-invalid={fieldState.invalid} />
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
@@ -179,7 +164,7 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel>Email</FieldLabel>
+										<FieldLabel>{t('clients.form.email')}</FieldLabel>
 										<Input {...field} aria-invalid={fieldState.invalid} />
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
@@ -196,20 +181,25 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel>Статус</FieldLabel>
+										<FieldLabel>{t('clients.table.status')}</FieldLabel>
 										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{(Object.keys(statusLabels) as ClientStatus[]).map(
-														status => (
-															<SelectItem key={status} value={status}>
-																{statusLabels[status]}
-															</SelectItem>
-														),
-													)}
+													{(
+														[
+															'active',
+															'pending',
+															'in_progress',
+															'archived',
+														] as ClientStatus[]
+													).map(status => (
+														<SelectItem key={status} value={status}>
+															{t(`clients.statuses.${status}`)}
+														</SelectItem>
+													))}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -226,20 +216,28 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel>Источник</FieldLabel>
+										<FieldLabel>{t('clients.form.source')}</FieldLabel>
 										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													{(Object.keys(sourceLabels) as ClientSource[]).map(
-														source => (
-															<SelectItem key={source} value={source}>
-																{sourceLabels[source]}
-															</SelectItem>
-														),
-													)}
+													{(
+														[
+															'Google',
+															'Yandex',
+															'WhatsApp',
+															'Social Media',
+															'Walk-in',
+															'Referral',
+															'Email',
+														] as ClientSource[]
+													).map(source => (
+														<SelectItem key={source} value={source}>
+															{t(`clients.sources.${source}`)}
+														</SelectItem>
+													))}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -257,14 +255,21 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 							control={form.control}
 							render={({ field, fieldState }) => (
 								<Field data-invalid={fieldState.invalid}>
-									<FieldLabel>Ответственный менеджер</FieldLabel>
-									<Select onValueChange={field.onChange} value={field.value}>
+									<FieldLabel>{t('clients.form.manager')}</FieldLabel>
+									<Select
+										onValueChange={field.onChange}
+										value={field.value || 'not_assigned'}
+									>
 										<SelectTrigger aria-invalid={fieldState.invalid}>
-											<SelectValue placeholder='Выберите менеджера' />
+											<SelectValue
+												placeholder={t('clients.form.selectManager')}
+											/>
 										</SelectTrigger>
 										<SelectContent>
 											<SelectGroup>
-												<SelectItem value=''>Не назначен</SelectItem>
+												<SelectItem value='not_assigned'>
+													{t('clients.form.noManager')}
+												</SelectItem>
 												{managers.map(manager => (
 													<SelectItem key={manager.id} value={manager.id}>
 														{manager.name}
@@ -284,7 +289,7 @@ function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
 
 				<DialogFooter>
 					<Button type='submit' form='edit-client-form'>
-						Сохранить изменения
+						{t('clients.form.saveChanges')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

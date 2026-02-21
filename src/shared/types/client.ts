@@ -35,18 +35,15 @@ export interface Client {
 	actionLogs: ClientActionLog[]
 }
 
-// Конфигурация статусов
-export const clientStatusConfig: Record<
-	ClientStatus,
-	{ label: string; className: string }
-> = {
-	active: { label: 'Активный', className: 'bg-green-100 text-green-700' },
-	pending: { label: 'Ожидает', className: 'bg-yellow-100 text-yellow-700' },
-	in_progress: { label: 'В процессе', className: 'bg-blue-100 text-blue-700' },
-	archived: { label: 'Архив', className: 'bg-slate-100 text-slate-500' },
+// Конфигурация статусов (только стили, метки берутся из i18n)
+export const clientStatusConfig: Record<ClientStatus, { className: string }> = {
+	active: { className: 'bg-green-100 text-green-700' },
+	pending: { className: 'bg-yellow-100 text-yellow-700' },
+	in_progress: { className: 'bg-blue-100 text-blue-700' },
+	archived: { className: 'bg-slate-100 text-slate-500' },
 }
 
-// Конфигурация источников
+// Конфигурация источников (только стили)
 export const clientSourceConfig: Record<ClientSource, { className: string }> = {
 	Google: { className: 'bg-blue-50 text-blue-700 border-blue-200' },
 	Yandex: { className: 'bg-red-50 text-red-700 border-red-200' },

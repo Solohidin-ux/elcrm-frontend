@@ -9,9 +9,11 @@ import {
 import { useClientsStore } from '@/shared/store/clients-store'
 import { clientStatusConfig, type ClientStatus } from '@/shared/types/client'
 import { Filter, Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import ClientsAdd from './ClientsAdd'
 
 function ClientsTopbar() {
+	const { t } = useTranslation()
 	const {
 		statusFilter,
 		setStatusFilter,
@@ -25,7 +27,7 @@ function ClientsTopbar() {
 			{/* Верхняя часть: Заголовок и Кнопка добавления */}
 			<div className='flex items-center justify-between'>
 				<h1 className='text-2xl font-bold tracking-tight text-gray-900'>
-					Список клиентов
+					{t('clients.title')}
 				</h1>
 				<ClientsAdd />
 			</div>
@@ -36,7 +38,7 @@ function ClientsTopbar() {
 				<div className='relative w-full sm:w-auto sm:max-w-[300px]'>
 					<Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400' />
 					<Input
-						placeholder='Поиск клиента...'
+						placeholder={t('clients.searchPlaceholder')}
 						className='h-10 w-full pl-9 bg-white border-slate-300 shadow-sm focus-visible:ring-slate-400'
 						onChange={e => setSearchQuery(e.target.value)}
 					/>
@@ -52,15 +54,15 @@ function ClientsTopbar() {
 						<SelectTrigger className='h-10 w-[150px] border-dashed border-slate-300 bg-white text-slate-600 shadow-sm'>
 							<div className='flex items-center gap-2'>
 								<Filter className='h-3.5 w-3.5 opacity-50' />
-								<SelectValue placeholder='Статус' />
+								<SelectValue placeholder={t('clients.table.status')} />
 							</div>
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value='all'>Все статусы</SelectItem>
+							<SelectItem value='all'>{t('clients.statuses.all')}</SelectItem>
 							{(Object.keys(clientStatusConfig) as ClientStatus[]).map(
 								status => (
 									<SelectItem key={status} value={status}>
-										{clientStatusConfig[status].label}
+										{t(`clients.statuses.${status}`)}
 									</SelectItem>
 								),
 							)}
@@ -76,8 +78,12 @@ function ClientsTopbar() {
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent align='end'>
-							<SelectItem value='without_archived'>Без архива</SelectItem>
-							<SelectItem value='with_archived'>С архивом</SelectItem>
+							<SelectItem value='without_archived'>
+								{t('clients.filters.withoutArchive')}
+							</SelectItem>
+							<SelectItem value='with_archived'>
+								{t('clients.filters.withArchive')}
+							</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>

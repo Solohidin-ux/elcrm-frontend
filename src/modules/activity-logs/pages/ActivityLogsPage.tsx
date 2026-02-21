@@ -12,7 +12,6 @@ import Layout from '@/shared/components/Layout'
 import { useActivityLogsStore } from '@/shared/store/activity-logs-store'
 import {
 	activityLogModuleConfig,
-	activityLogTypeConfig,
 	type ActivityLogModule,
 	type ActivityLogType,
 } from '@/shared/types/activity-log'
@@ -35,6 +34,7 @@ import {
 	UserPlus,
 	X,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 // Иконки для типов логов
 const logTypeIcons: Record<ActivityLogType, React.ReactNode> = {
@@ -59,6 +59,7 @@ const logTypeIcons: Record<ActivityLogType, React.ReactNode> = {
 }
 
 function ActivityLogsPage() {
+	const { t } = useTranslation()
 	const {
 		filteredLogs,
 		moduleFilter,
@@ -90,14 +91,14 @@ function ActivityLogsPage() {
 			<div className='flex items-center justify-between p-4 border-b'>
 				<div>
 					<h1 className='text-2xl font-bold tracking-tight text-gray-900'>
-						История действий
+						{t('activityLogs.title')}
 					</h1>
 					<p className='text-sm text-muted-foreground mt-1'>
-						Все действия в системе: создание, изменения, звонки, сообщения
+						{t('activityLogs.description')}
 					</p>
 				</div>
 				<div className='text-sm text-muted-foreground'>
-					Всего записей: {filteredLogs.length}
+					{t('activityLogs.totalRecords')}: {filteredLogs.length}
 				</div>
 			</div>
 
@@ -108,7 +109,7 @@ function ActivityLogsPage() {
 					<div className='relative flex-1 max-w-md'>
 						<Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400' />
 						<Input
-							placeholder='Поиск по действиям...'
+							placeholder={t('activityLogs.searchPlaceholder')}
 							value={searchQuery}
 							onChange={e => setSearchQuery(e.target.value)}
 							className='h-10 pl-9 bg-white'
@@ -128,14 +129,16 @@ function ActivityLogsPage() {
 								<SelectValue placeholder='Модуль' />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value='all'>Все модули</SelectItem>
-								{Object.entries(activityLogModuleConfig).map(
-									([key, config]) => (
-										<SelectItem key={key} value={key}>
-											{config.label}
-										</SelectItem>
-									),
-								)}
+								<SelectItem value='all'>
+									{t('activityLogs.allModules')}
+								</SelectItem>
+								{(
+									Object.keys(activityLogModuleConfig) as ActivityLogModule[]
+								).map(module => (
+									<SelectItem key={module} value={module}>
+										{t(`activityLogs.modules.${module}`)}
+									</SelectItem>
+								))}
 							</SelectContent>
 						</Select>
 
@@ -145,13 +148,35 @@ function ActivityLogsPage() {
 							onValueChange={v => setTypeFilter(v as ActivityLogType | 'all')}
 						>
 							<SelectTrigger className='h-10 w-[180px] bg-white'>
-								<SelectValue placeholder='Тип действия' />
+								<SelectValue placeholder='Тип' />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value='all'>Все типы</SelectItem>
-								{Object.entries(activityLogTypeConfig).map(([key, config]) => (
-									<SelectItem key={key} value={key}>
-										{config.label}
+								<SelectItem value='all'>
+									{t('activityLogs.allTypes')}
+								</SelectItem>
+								{(
+									[
+										'client_created',
+										'client_updated',
+										'client_deleted',
+										'client_archived',
+										'client_restored',
+										'client_status_changed',
+										'client_manager_assigned',
+										'deal_created',
+										'deal_status_changed',
+										'deal_product_added',
+										'deal_reminder_set',
+										'deal_refused',
+										'deal_sold',
+										'call_made',
+										'message_sent',
+										'note_added',
+										'reminder_added',
+									] as ActivityLogType[]
+								).map(type => (
+									<SelectItem key={type} value={type}>
+										{t(`activityLogs.types.${type}`)}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -163,7 +188,7 @@ function ActivityLogsPage() {
 							value={dateFrom}
 							onChange={e => setDateFrom(e.target.value)}
 							className='h-10 w-[150px] bg-white'
-							placeholder='От'
+							placeholder={t('common.from')}
 						/>
 
 						{/* Дата до */}
@@ -172,12 +197,12 @@ function ActivityLogsPage() {
 							value={dateTo}
 							onChange={e => setDateTo(e.target.value)}
 							className='h-10 w-[150px] bg-white'
-							placeholder='До'
+							placeholder={t('common.to')}
 						/>
 
 						{/* Сбросить фильтры */}
 						<Button variant='outline' size='sm' onClick={clearFilters}>
-							Сбросить
+							{t('activityLogs.clearFilters')}
 						</Button>
 					</div>
 				</div>
@@ -188,9 +213,9 @@ function ActivityLogsPage() {
 				{filteredLogs.length === 0 ? (
 					<div className='text-center py-12'>
 						<Activity className='h-12 w-12 text-slate-300 mx-auto mb-4' />
-						<p className='text-slate-500'>Нет записей</p>
+						<p className='text-slate-500'>{t('activityLogs.noData')}</p>
 						<p className='text-sm text-slate-400 mt-1'>
-							Попробуйте изменить параметры фильтрации
+							{t('activityLogs.noDataHint')}
 						</p>
 					</div>
 				) : (
@@ -209,7 +234,9 @@ function ActivityLogsPage() {
 								<div className='flex-1 min-w-0'>
 									<div className='flex items-start justify-between gap-4'>
 										<div>
-											<p className='font-medium text-slate-900'>{log.action}</p>
+											<p className='font-medium text-slate-900'>
+												{t(`activityLogs.types.${log.type}`)}
+											</p>
 											{log.description && (
 												<p className='text-sm text-slate-600 mt-0.5'>
 													{log.description}
@@ -217,7 +244,7 @@ function ActivityLogsPage() {
 											)}
 											{log.entityName && (
 												<p className='text-xs text-slate-500 mt-1'>
-													Сущность: {log.entityName}
+													{t('activityLogs.entity')}: {log.entityName}
 												</p>
 											)}
 										</div>
@@ -227,7 +254,7 @@ function ActivityLogsPage() {
 												variant='secondary'
 												className={activityLogModuleConfig[log.module].color}
 											>
-												{activityLogModuleConfig[log.module].label}
+												{t(`activityLogs.modules.${log.module}`)}
 											</Badge>
 										</div>
 									</div>
