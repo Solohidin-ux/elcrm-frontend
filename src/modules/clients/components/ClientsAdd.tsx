@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -29,32 +30,33 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { useClientsStore } from '@/shared/store/clients-store'
+import {
+	managers,
+	type ClientSource,
+	type ClientStatus,
+} from '@/shared/types/client'
 
 const formSchema = z.object({
 	name: z.string().min(2, 'Имя должно быть не короче 2 символов'),
 	email: z.string().email('Введите корректный email'),
 	phone: z.string().min(10, 'Минимум 10 цифр'),
-	status: z.enum(['Active', 'Pending', 'Inactive', 'Blocked'], {
-		required_error: 'Выберите статус',
-	}),
-	source: z.enum(
-		[
-			'Google',
-			'Yandex',
-			'Social Media',
-			'Referral',
-			'Email',
-			'WhatsApp',
-			'Walk-in',
-		],
-		{
-			required_error: 'Выберите источник',
-		},
-	),
+	status: z.enum(['active', 'pending', 'in_progress', 'archived'] as const),
+	source: z.enum([
+		'Google',
+		'Yandex',
+		'Social Media',
+		'Referral',
+		'Email',
+		'WhatsApp',
+		'Walk-in',
+	] as const),
+	managerId: z.string().optional(),
 })
 
 function ClientsAdd() {
 	const [open, setOpen] = useState(false)
+	const { addClient } = useClientsStore()
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -62,25 +64,49 @@ function ClientsAdd() {
 			name: '',
 			email: '',
 			phone: '',
-			status: 'Active',
+			status: 'active',
 			source: 'Walk-in',
+			managerId: '',
 		},
 	})
 
 	const onSubmit = (data: z.infer<typeof formSchema>) => {
-		const newClient = {
-			...data,
-			id: `USR-${Math.floor(Math.random() * 10000)}`,
-			last_activity_at: new Date().toISOString(),
-		}
+		const selectedManager = managers.find(m => m.id === data.managerId)
 
-		console.group('🚀 Данные формы отправлены')
-		console.log('Raw Data:', data)
-		console.log('Formatted Client:', newClient)
-		console.groupEnd()
+		addClient({
+			name: data.name,
+			email: data.email,
+			phone: data.phone,
+			status: data.status,
+			source: data.source,
+			managerId: data.managerId || undefined,
+			managerName: selectedManager?.name || undefined,
+			lastContactAt: new Date().toISOString(),
+		})
+
+		toast.success('Клиент добавлен', {
+			description: `${data.name} успешно добавлен в список клиентов.`,
+		})
 
 		setOpen(false)
 		form.reset()
+	}
+
+	const statusLabels: Record<ClientStatus, string> = {
+		active: 'Активный',
+		pending: 'Ожидает',
+		in_progress: 'В процессе',
+		archived: 'Архив',
+	}
+
+	const sourceLabels: Record<ClientSource, string> = {
+		Google: 'Google',
+		Yandex: 'Yandex',
+		WhatsApp: 'WhatsApp',
+		'Social Media': 'Соцсети',
+		'Walk-in': 'Пришел сам',
+		Referral: 'Рекомендация',
+		Email: 'Email',
 	}
 
 	const content = (
@@ -176,19 +202,19 @@ function ClientsAdd() {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel>Статус</FieldLabel>
-										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
+										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue placeholder='Выберите...' />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													<SelectItem value='Active'>Активен</SelectItem>
-													<SelectItem value='Pending'>Ожидает</SelectItem>
-													<SelectItem value='Inactive'>Неактивен</SelectItem>
-													<SelectItem value='Blocked'>Заблокирован</SelectItem>
+													{(Object.keys(statusLabels) as ClientStatus[]).map(
+														status => (
+															<SelectItem key={status} value={status}>
+																{statusLabels[status]}
+															</SelectItem>
+														),
+													)}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -206,22 +232,19 @@ function ClientsAdd() {
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel>Источник</FieldLabel>
-										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
+										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue placeholder='Выберите...' />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													<SelectItem value='Google'>Google</SelectItem>
-													<SelectItem value='Yandex'>Yandex</SelectItem>
-													<SelectItem value='WhatsApp'>WhatsApp</SelectItem>
-													<SelectItem value='Social Media'>Соцсети</SelectItem>
-													<SelectItem value='Walk-in'>Пришел сам</SelectItem>
-													<SelectItem value='Referral'>Рекомендация</SelectItem>
-													<SelectItem value='Email'>Email</SelectItem>
+													{(Object.keys(sourceLabels) as ClientSource[]).map(
+														source => (
+															<SelectItem key={source} value={source}>
+																{sourceLabels[source]}
+															</SelectItem>
+														),
+													)}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -232,6 +255,35 @@ function ClientsAdd() {
 								)}
 							/>
 						</div>
+
+						{/* --- МЕНЕДЖЕР --- */}
+						<Controller
+							name='managerId'
+							control={form.control}
+							render={({ field, fieldState }) => (
+								<Field data-invalid={fieldState.invalid}>
+									<FieldLabel>Ответственный менеджер</FieldLabel>
+									<Select onValueChange={field.onChange} value={field.value}>
+										<SelectTrigger aria-invalid={fieldState.invalid}>
+											<SelectValue placeholder='Выберите менеджера' />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectGroup>
+												<SelectItem value=''>Не назначен</SelectItem>
+												{managers.map(manager => (
+													<SelectItem key={manager.id} value={manager.id}>
+														{manager.name}
+													</SelectItem>
+												))}
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+									{fieldState.invalid && (
+										<FieldError errors={[fieldState.error]} />
+									)}
+								</Field>
+							)}
+						/>
 					</FieldGroup>
 				</form>
 

@@ -8,6 +8,8 @@ export const ru = {
 		clients: 'Клиенты',
 		products: 'Товары',
 		funnel: 'Воронка продаж',
+		activityLogs: 'История действий',
+		archive: 'Архив',
 	},
 	kanban: {
 		columns: {

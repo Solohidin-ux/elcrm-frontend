@@ -13,7 +13,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-// Используем ваши кастомные Field компоненты
 import {
 	Field,
 	FieldError,
@@ -29,14 +28,20 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { type User } from './ClientsTable'
+import { useClientsStore } from '@/shared/store/clients-store'
+import {
+	managers,
+	type Client,
+	type ClientSource,
+	type ClientStatus,
+} from '@/shared/types/client'
 
 // Схема валидации
 const formSchema = z.object({
 	name: z.string().min(2, 'Минимум 2 символа'),
 	email: z.string().email('Некорректный email'),
 	phone: z.string().min(10, 'Некорректный телефон'),
-	status: z.enum(['Active', 'Pending', 'Inactive', 'Blocked'] as const),
+	status: z.enum(['active', 'pending', 'in_progress', 'archived'] as const),
 	source: z.enum([
 		'Google',
 		'Yandex',
@@ -46,59 +51,79 @@ const formSchema = z.object({
 		'WhatsApp',
 		'Walk-in',
 	] as const),
+	managerId: z.string().optional(),
+	managerName: z.string().optional(),
 })
 
-interface ClientsEditClientProps {
-	user: User | null
+interface ClientsEditProps {
+	client: Client | null
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	onSave: (updatedUser: User) => void
 }
 
-function ClientsEdit({
-	user,
-	open,
-	onOpenChange,
-	onSave,
-}: ClientsEditClientProps) {
+function ClientsEdit({ client, open, onOpenChange }: ClientsEditProps) {
+	const { updateClient } = useClientsStore()
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: '',
 			email: '',
 			phone: '',
-			status: 'Active',
+			status: 'active',
 			source: 'Walk-in',
+			managerId: '',
+			managerName: '',
 		},
 	})
 
 	useEffect(() => {
-		if (user) {
+		if (client) {
 			form.reset({
-				name: user.name,
-				email: user.email,
-				phone: user.phone,
-				status: user.status,
-				source: user.source,
+				name: client.name,
+				email: client.email,
+				phone: client.phone,
+				status: client.status,
+				source: client.source,
+				managerId: client.managerId || '',
+				managerName: client.managerName || '',
 			})
 		}
-	}, [user, form])
+	}, [client, form])
 
 	const onSubmit = (values: z.infer<typeof formSchema>) => {
-		if (!user) return
+		if (!client) return
 
-		const updatedUser: User = {
-			...user,
+		// Находим имя менеджера по ID
+		const selectedManager = managers.find(m => m.id === values.managerId)
+
+		updateClient(client.id, {
 			...values,
-		}
-
-		onSave(updatedUser)
+			managerName: selectedManager?.name || values.managerName,
+		})
 
 		toast.success('Клиент обновлен', {
 			description: `Данные для ${values.name} успешно сохранены.`,
 		})
 
 		onOpenChange(false)
+	}
+
+	const statusLabels: Record<ClientStatus, string> = {
+		active: 'Активный',
+		pending: 'Ожидает',
+		in_progress: 'В процессе',
+		archived: 'Архив',
+	}
+
+	const sourceLabels: Record<ClientSource, string> = {
+		Google: 'Google',
+		Yandex: 'Yandex',
+		WhatsApp: 'WhatsApp',
+		'Social Media': 'Соцсети',
+		'Walk-in': 'Пришел сам',
+		Referral: 'Рекомендация',
+		Email: 'Email',
 	}
 
 	const content = (
@@ -172,20 +197,19 @@ function ClientsEdit({
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel>Статус</FieldLabel>
-										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-											value={field.value}
-										>
+										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													<SelectItem value='Active'>Активен</SelectItem>
-													<SelectItem value='Pending'>Ожидает</SelectItem>
-													<SelectItem value='Inactive'>Неактивен</SelectItem>
-													<SelectItem value='Blocked'>Заблокирован</SelectItem>
+													{(Object.keys(statusLabels) as ClientStatus[]).map(
+														status => (
+															<SelectItem key={status} value={status}>
+																{statusLabels[status]}
+															</SelectItem>
+														),
+													)}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -203,23 +227,19 @@ function ClientsEdit({
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
 										<FieldLabel>Источник</FieldLabel>
-										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-											value={field.value}
-										>
+										<Select onValueChange={field.onChange} value={field.value}>
 											<SelectTrigger aria-invalid={fieldState.invalid}>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
-													<SelectItem value='Google'>Google</SelectItem>
-													<SelectItem value='Yandex'>Yandex</SelectItem>
-													<SelectItem value='WhatsApp'>WhatsApp</SelectItem>
-													<SelectItem value='Social Media'>Соцсети</SelectItem>
-													<SelectItem value='Walk-in'>Пришел сам</SelectItem>
-													<SelectItem value='Referral'>Рекомендация</SelectItem>
-													<SelectItem value='Email'>Email</SelectItem>
+													{(Object.keys(sourceLabels) as ClientSource[]).map(
+														source => (
+															<SelectItem key={source} value={source}>
+																{sourceLabels[source]}
+															</SelectItem>
+														),
+													)}
 												</SelectGroup>
 											</SelectContent>
 										</Select>
@@ -230,6 +250,35 @@ function ClientsEdit({
 								)}
 							/>
 						</div>
+
+						{/* МЕНЕДЖЕР */}
+						<Controller
+							name='managerId'
+							control={form.control}
+							render={({ field, fieldState }) => (
+								<Field data-invalid={fieldState.invalid}>
+									<FieldLabel>Ответственный менеджер</FieldLabel>
+									<Select onValueChange={field.onChange} value={field.value}>
+										<SelectTrigger aria-invalid={fieldState.invalid}>
+											<SelectValue placeholder='Выберите менеджера' />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectGroup>
+												<SelectItem value=''>Не назначен</SelectItem>
+												{managers.map(manager => (
+													<SelectItem key={manager.id} value={manager.id}>
+														{manager.name}
+													</SelectItem>
+												))}
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+									{fieldState.invalid && (
+										<FieldError errors={[fieldState.error]} />
+									)}
+								</Field>
+							)}
+						/>
 					</FieldGroup>
 				</form>
 

@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import ActivityLogsPage from './modules/activity-logs/pages/ActivityLogsPage'
 import ClientsPage from './modules/clients/pages/ClientsPage'
 import DashboardPage from './modules/dashboard/pages/DashboardPage'
 import FinancesPage from './modules/finances/pages/FinancesPage'
@@ -25,6 +26,7 @@ function App() {
 					element={<FunnelTaskDetailPage />}
 				/>
 				<Route path={UrlNames.FINANCES} element={<FinancesPage />} />
+				<Route path={UrlNames.ACTIVITY_LOGS} element={<ActivityLogsPage />} />
 
 				<Route path='/settings' element={<SettingsPage />} />
 				<Route path={UrlNames.SEARCH} element={<SearchResultsPage />} />

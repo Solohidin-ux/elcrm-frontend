@@ -1,4 +1,5 @@
 import {
+	Activity,
 	ChartPie,
 	DollarSign,
 	House,
@@ -88,6 +89,11 @@ function Sidebar() {
 						href: UrlNames.FINANCES,
 						label: t('sidebar.finance'),
 						icon: DollarSign,
+					},
+					{
+						href: UrlNames.ACTIVITY_LOGS,
+						label: t('sidebar.activityLogs'),
+						icon: Activity,
 					},
 				]
 		}

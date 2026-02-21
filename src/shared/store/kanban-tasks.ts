@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { initialTasks, type Task } from '@/shared/utils/moc-data'
+import { create } from 'zustand'
 
 type TaskId = Task['id']
 type ChecklistItemId = string
@@ -9,12 +9,28 @@ interface KanbanTasksState {
 	setTasks: (tasks: Task[] | ((prev: Task[]) => Task[])) => void
 	addTask: (task: Omit<Task, 'id'>) => void
 	updateTask: (taskId: TaskId, updates: Partial<Task>) => void
-	toggleChecklistItem: (taskId: TaskId, itemId: ChecklistItemId, done: boolean) => void
-	addNote: (taskId: TaskId, note: Omit<NonNullable<Task['notes']>[0], 'id' | 'createdAt'>) => void
-	addReminder: (taskId: TaskId, reminder: Omit<NonNullable<Task['reminders']>[0], 'id'>) => void
+	toggleChecklistItem: (
+		taskId: TaskId,
+		itemId: ChecklistItemId,
+		done: boolean,
+	) => void
+	addNote: (
+		taskId: TaskId,
+		note: Omit<NonNullable<Task['notes']>[0], 'id' | 'createdAt'>,
+	) => void
+	addReminder: (
+		taskId: TaskId,
+		reminder: Omit<NonNullable<Task['reminders']>[0], 'id'>,
+	) => void
 	toggleReminder: (taskId: TaskId, reminderId: string) => void
-	addInternalMessage: (taskId: TaskId, message: Omit<NonNullable<Task['internalMessages']>[0], 'id' | 'createdAt'>) => void
-	addActionLog: (taskId: TaskId, log: Omit<NonNullable<Task['actionLogs']>[0], 'id' | 'timestamp'>) => void
+	addInternalMessage: (
+		taskId: TaskId,
+		message: Omit<NonNullable<Task['internalMessages']>[0], 'id' | 'createdAt'>,
+	) => void
+	addActionLog: (
+		taskId: TaskId,
+		log: Omit<NonNullable<Task['actionLogs']>[0], 'id' | 'timestamp'>,
+	) => void
 	addTodoItem: (taskId: TaskId, text: string) => void
 	toggleTodoItem: (taskId: TaskId, itemId: string, done: boolean) => void
 	deleteTodoItem: (taskId: TaskId, itemId: string) => void
