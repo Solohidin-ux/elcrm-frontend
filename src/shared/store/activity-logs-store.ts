@@ -241,7 +241,7 @@ export const useActivityLogsStore = create<ActivityLogsState>((set, get) => ({
 	addLog: logPayload => {
 		const newLog: ActivityLog = {
 			...logPayload,
-			id: `log-${Date.now()}`,
+			id: `log-${crypto.randomUUID()}`,
 			timestamp: new Date().toISOString(),
 		}
 

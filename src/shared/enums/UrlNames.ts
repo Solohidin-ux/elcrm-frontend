@@ -11,4 +11,6 @@ export const UrlNames = {
 	ARCHIVE: '/archive',
 
 	SEARCH: '/search',
+
+	LOGIN: '/login',
 } as const

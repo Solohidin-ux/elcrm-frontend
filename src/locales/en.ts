@@ -15,12 +15,20 @@ export const en = {
 
 	// Kanban
 	kanban: {
+		addTask: 'Add Task',
+
 		columns: {
 			new: 'New',
 			contacted: 'Contacted',
 			agreed: 'Agreed',
 			bought: 'Bought',
 			refused: 'Refused',
+		},
+
+		toasts: {
+			updatedStatus: 'Status Updated',
+			taskMoved:
+				'Task "{{taskTitle}}" was moved from "{{initialStatusTitle}}" to "{{currentStatusTitle}}"',
 		},
 	},
 

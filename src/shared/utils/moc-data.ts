@@ -126,6 +126,7 @@ export type WhatsAppMessage = {
 	from: 'client' | 'manager'
 	text: string
 	time: string
+	timestamp: number // Unix timestamp for sorting
 }
 
 // Finance Types
@@ -457,41 +458,41 @@ export const initialTasks: Task[] = [
 
 export const taskChatMessages: Record<string, WhatsAppMessage[]> = {
 	'1': [
-		{ id: 'm1', from: 'client', text: 'Добрый день! Интересует разработка MVP для нашего стартапа.', time: '10:32' },
-		{ id: 'm2', from: 'manager', text: 'Добрый день! Расскажите, пожалуйста, какой функционал планируете в первую очередь?', time: '10:35' },
-		{ id: 'm3', from: 'client', text: 'Нужен личный кабинет, каталог и оплата. Сроки сжатые — к концу января.', time: '10:38' },
-		{ id: 'm4', from: 'manager', text: 'Понял. Отправил коммерческое предложение на почту. Бюджет 450 000 ₽ укладывается?', time: '10:42' },
-		{ id: 'm5', from: 'client', text: 'Да, бюджет ок. Ждём смету по этапам.', time: '11:15' },
+		{ id: 'm1', from: 'client', text: 'Добрый день! Интересует разработка MVP для нашего стартапа.', time: '10:32', timestamp: new Date('2025-01-10T10:32:00').getTime() },
+		{ id: 'm2', from: 'manager', text: 'Добрый день! Расскажите, пожалуйста, какой функционал планируете в первую очередь?', time: '10:35', timestamp: new Date('2025-01-10T10:35:00').getTime() },
+		{ id: 'm3', from: 'client', text: 'Нужен личный кабинет, каталог и оплата. Сроки сжатые — к концу января.', time: '10:38', timestamp: new Date('2025-01-10T10:38:00').getTime() },
+		{ id: 'm4', from: 'manager', text: 'Понял. Отправил коммерческое предложение на почту. Бюджет 450 000 ₽ укладывается?', time: '10:42', timestamp: new Date('2025-01-10T10:42:00').getTime() },
+		{ id: 'm5', from: 'client', text: 'Да, бюджет ок. Ждём смету по этапам.', time: '11:15', timestamp: new Date('2025-01-10T11:15:00').getTime() },
 	],
 	'2': [
-		{ id: 'm1', from: 'manager', text: 'Здравствуйте! Готов черновой макет главной страницы. Можем созвониться сегодня?', time: '09:00' },
-		{ id: 'm2', from: 'client', text: 'Доброе утро. Да, после 14:00 свободен.', time: '09:12' },
-		{ id: 'm3', from: 'manager', text: 'Отлично, создам встречу на 14:30. Ссылку пришлю в календарь.', time: '09:15' },
-		{ id: 'm4', from: 'client', text: 'Ждем утверждения макета главной, потом перейдём к остальным страницам.', time: '14:45' },
+		{ id: 'm1', from: 'manager', text: 'Здравствуйте! Готов черновой макет главной страницы. Можем созвониться сегодня?', time: '09:00', timestamp: new Date('2025-01-12T09:00:00').getTime() },
+		{ id: 'm2', from: 'client', text: 'Доброе утро. Да, после 14:00 свободен.', time: '09:12', timestamp: new Date('2025-01-12T09:12:00').getTime() },
+		{ id: 'm3', from: 'manager', text: 'Отлично, создам встречу на 14:30. Ссылку пришлю в календарь.', time: '09:15', timestamp: new Date('2025-01-12T09:15:00').getTime() },
+		{ id: 'm4', from: 'client', text: 'Ждем утверждения макета главной, потом перейдём к остальным страницам.', time: '14:45', timestamp: new Date('2025-01-12T14:45:00').getTime() },
 	],
 	'3': [
-		{ id: 'm1', from: 'client', text: 'Когда будет готов отчёт по аудиту?', time: '11:20' },
-		{ id: 'm2', from: 'manager', text: 'К концу недели подготовлю предварительную версию. Сегодня закончу раздел по безопасности.', time: '11:25' },
+		{ id: 'm1', from: 'client', text: 'Когда будет готов отчёт по аудиту?', time: '11:20', timestamp: new Date('2025-01-14T11:20:00').getTime() },
+		{ id: 'm2', from: 'manager', text: 'К концу недели подготовлю предварительную версию. Сегодня закончу раздел по безопасности.', time: '11:25', timestamp: new Date('2025-01-14T11:25:00').getTime() },
 	],
 	'4': [
-		{ id: 'm1', from: 'client', text: 'Спасибо за работу! Всё сдали в срок.', time: '18:00' },
-		{ id: 'm2', from: 'manager', text: 'Благодарим за обратную связь. Если понадобится доработка — пишите.', time: '18:05' },
+		{ id: 'm1', from: 'client', text: 'Спасибо за работу! Всё сдали в срок.', time: '18:00', timestamp: new Date('2025-01-08T18:00:00').getTime() },
+		{ id: 'm2', from: 'manager', text: 'Благодарим за обратную связь. Если понадобится доработка — пишите.', time: '18:05', timestamp: new Date('2025-01-08T18:05:00').getTime() },
 	],
 	'5': [
-		{ id: 'm1', from: 'manager', text: 'Добрый день! По Smart Contracts — нужны ли вам тесты на Solidity или только аудит кода?', time: '12:00' },
-		{ id: 'm2', from: 'client', text: 'И аудит, и тесты. У нас уже есть черновая версия.', time: '12:30' },
+		{ id: 'm1', from: 'manager', text: 'Добрый день! По Smart Contracts — нужны ли вам тесты на Solidity или только аудит кода?', time: '12:00', timestamp: new Date('2025-01-16T12:00:00').getTime() },
+		{ id: 'm2', from: 'client', text: 'И аудит, и тесты. У нас уже есть черновая версия.', time: '12:30', timestamp: new Date('2025-01-16T12:30:00').getTime() },
 	],
 	'6': [
-		{ id: 'm1', from: 'client', text: 'Хотим интегрировать CRM с 1С. Это входит в ваш пакет?', time: '15:00' },
-		{ id: 'm2', from: 'manager', text: 'Да, интеграция с 1С входит. Оценка 250 000 ₽, срок 2 недели после подписания.', time: '15:20' },
+		{ id: 'm1', from: 'client', text: 'Хотим интегрировать CRM с 1С. Это входит в ваш пакет?', time: '15:00', timestamp: new Date('2025-01-18T15:00:00').getTime() },
+		{ id: 'm2', from: 'manager', text: 'Да, интеграция с 1С входит. Оценка 250 000 ₽, срок 2 недели после подписания.', time: '15:20', timestamp: new Date('2025-01-18T15:20:00').getTime() },
 	],
 	'7': [
-		{ id: 'm1', from: 'manager', text: 'Здравствуйте! Назначили вас на аудит. Когда удобно созвониться?', time: '10:00' },
-		{ id: 'm2', from: 'client', text: 'В четверг после 17:00.', time: '10:15' },
+		{ id: 'm1', from: 'manager', text: 'Здравствуйте! Назначили вас на аудит. Когда удобно созвониться?', time: '10:00', timestamp: new Date('2025-01-20T10:00:00').getTime() },
+		{ id: 'm2', from: 'client', text: 'В четверг после 17:00.', time: '10:15', timestamp: new Date('2025-01-20T10:15:00').getTime() },
 	],
 	'8': [
-		{ id: 'm1', from: 'client', text: 'Нужен дизайн мобильного приложения под iOS и Android. Есть референсы.', time: '16:00' },
-		{ id: 'm2', from: 'manager', text: 'Пришлите референсы и ТЗ, подготовлю оценку по срокам и бюджету.', time: '16:30' },
+		{ id: 'm1', from: 'client', text: 'Нужен дизайн мобильного приложения под iOS и Android. Есть референсы.', time: '16:00', timestamp: new Date('2025-01-22T16:00:00').getTime() },
+		{ id: 'm2', from: 'manager', text: 'Пришлите референсы и ТЗ, подготовлю оценку по срокам и бюджету.', time: '16:30', timestamp: new Date('2025-01-22T16:30:00').getTime() },
 	],
 }
 

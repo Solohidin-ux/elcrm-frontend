@@ -24,6 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { useAuthStore } from '@/shared/store/auth-store'
 import type { ColumnType, Task } from '@/shared/utils/moc-data'
 
 interface TaskQuickActionsProps {
@@ -45,6 +46,7 @@ export default function TaskQuickActions({
 	onRefuse,
 	onSetStatusFlag,
 }: TaskQuickActionsProps) {
+	const { user } = useAuthStore()
 	const [showRefuseDialog, setShowRefuseDialog] = useState(false)
 	const [refuseComment, setRefuseComment] = useState('')
 	const [showFlagDialog, setShowFlagDialog] = useState(false)
@@ -65,7 +67,7 @@ export default function TaskQuickActions({
 			type: flagType,
 			reason: flagReason.trim() || undefined,
 			setAt: new Date().toISOString(),
-			setBy: 'Текущий пользователь',
+			setBy: user?.name ?? 'Неизвестный пользователь',
 		})
 		setFlagType('none')
 		setFlagReason('')

@@ -1,3 +1,23 @@
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+import Layout from '@/shared/components/Layout'
+import { UrlNames } from '@/shared/enums/UrlNames'
+import { useAuthStore } from '@/shared/store/auth-store'
+import { useKanbanTasksStore } from '@/shared/store/kanban-tasks'
+import {
+	taskChatMessages,
+	type ColumnType,
+	type Task,
+} from '@/shared/utils/moc-data'
 import {
 	ArrowLeft,
 	Calendar,
@@ -13,26 +33,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
-import { cn } from '@/lib/utils'
-import Layout from '@/shared/components/Layout'
-import { UrlNames } from '@/shared/enums/UrlNames'
-import { useKanbanTasksStore } from '@/shared/store/kanban-tasks'
-import {
-	taskChatMessages,
-	type ColumnType,
-	type Task,
-	type WhatsAppMessage,
-} from '@/shared/utils/moc-data'
+import { toast } from 'sonner'
 import TaskActionLogs from '../components/TaskActionLogs'
 import TaskNotes from '../components/TaskNotes'
 import TaskQuickActions from '../components/TaskQuickActions'
@@ -82,7 +83,6 @@ export default function FunnelTaskDetailPage() {
 	const { taskId } = useParams<{ taskId: string }>()
 	const navigate = useNavigate()
 	const {
-		tasks,
 		toggleChecklistItem,
 		updateTask,
 		addNote,
@@ -91,21 +91,31 @@ export default function FunnelTaskDetailPage() {
 		addInternalMessage,
 		addActionLog,
 	} = useKanbanTasksStore()
-	const [discountType, setDiscountType] = useState<'percent' | 'amount'>('percent')
+	const { user } = useAuthStore()
+
+	const task = useKanbanTasksStore(state =>
+		state.tasks.find(t => String(t.id) === taskId)
+	)
+	const internalMessages = useKanbanTasksStore(state =>
+		state.tasks.find(t => String(t.id) === taskId)?.internalMessages
+	)
+
+	if (!task) {
+		return <Navigate to={UrlNames.FUNNEL} replace />
+	}
+
+	const [discountType, setDiscountType] = useState<'percent' | 'amount'>(
+		'percent',
+	)
 	const [discountValue, setDiscountValue] = useState<string>('')
 	const [chatMessage, setChatMessage] = useState<string>('')
 
-	const currentUser = 'user1'
-	const currentUserName = 'Текущий пользователь'
+	const currentUserId = user?.id ?? 'unknown'
+	const currentUserName = user?.name ?? 'Неизвестный пользователь'
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
-	const task = useMemo(
-		() => tasks.find(t => String(t.id) === taskId),
-		[taskId, tasks],
-	)
-
 	const whatsappMessages = useMemo(
-		() => (taskId ? taskChatMessages[taskId] ?? [] : []),
+		() => taskChatMessages[taskId] ?? [],
 		[taskId],
 	)
 
@@ -114,9 +124,9 @@ export default function FunnelTaskDetailPage() {
 		const whatsapp = whatsappMessages.map(msg => ({
 			...msg,
 			type: 'whatsapp' as const,
-			timestamp: new Date().getTime(), // Временная метка для сортировки
+			timestamp: msg.timestamp,
 		}))
-		const internal = (task.internalMessages || []).map(msg => ({
+		const internal = (internalMessages || []).map(msg => ({
 			id: msg.id,
 			text: msg.text,
 			from: 'manager' as const,
@@ -128,24 +138,11 @@ export default function FunnelTaskDetailPage() {
 			userName: msg.userName,
 			timestamp: new Date(msg.createdAt).getTime(),
 		}))
-		// Сортируем по времени (внутренние сообщения по дате создания, WhatsApp по порядку)
-		return [...whatsapp, ...internal].sort((a, b) => {
-			if (a.type === 'internal' && b.type === 'internal') {
-				return a.timestamp - b.timestamp
-			}
-			if (a.type === 'whatsapp' && b.type === 'whatsapp') {
-				return 0 // Сохраняем порядок WhatsApp сообщений
-			}
-			// Смешиваем типы - внутренние сообщения идут после WhatsApp
-			return a.type === 'whatsapp' ? -1 : 1
-		})
-	}, [whatsappMessages, task.internalMessages])
+		return [...whatsapp, ...internal].sort((a, b) => a.timestamp - b.timestamp)
+	}, [whatsappMessages, internalMessages])
 
-	if (!task) {
-		return <Navigate to={UrlNames.FUNNEL} replace />
-	}
-
-	const clientName = task.clientInfo?.name ?? task.title.split('—')[0]?.trim() ?? 'Клиент'
+	const clientName =
+		task.clientInfo?.name ?? task.title.split('—')[0]?.trim() ?? 'Клиент'
 
 	// Расчет суммы из товаров
 	const productsTotal = useMemo(() => {
@@ -158,6 +155,14 @@ export default function FunnelTaskDetailPage() {
 		if (!task.discount) return 0
 		if (task.discount.type === 'percent') {
 			return (productsTotal * task.discount.value) / 100
+		}
+
+		if (
+			task.discount.type === 'amount' &&
+			task.discount.value > productsTotal
+		) {
+			toast.error('Скидка не может быть больше суммы товаров')
+			return 0
 		}
 		return task.discount.value
 	}, [task.discount, productsTotal])
@@ -211,7 +216,9 @@ export default function FunnelTaskDetailPage() {
 					/>
 					<div>
 						<p className='text-sm font-medium'>{name}</p>
-						<p className='text-xs text-muted-foreground'>Прикреплённый менеджер</p>
+						<p className='text-xs text-muted-foreground'>
+							Прикреплённый менеджер
+						</p>
 					</div>
 				</div>
 			)
@@ -223,7 +230,9 @@ export default function FunnelTaskDetailPage() {
 				</div>
 				<div>
 					<p className='text-sm font-medium'>{name}</p>
-					<p className='text-xs text-muted-foreground'>Прикреплённый менеджер</p>
+					<p className='text-xs text-muted-foreground'>
+						Прикреплённый менеджер
+					</p>
 				</div>
 			</div>
 		)
@@ -236,19 +245,18 @@ export default function FunnelTaskDetailPage() {
 		}
 		addActionLog(task.id, {
 			action: 'Звонок клиенту',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 		})
 	}
 
 	const handleMessage = () => {
-		// Можно открыть WhatsApp или другой мессенджер
 		if (task.clientInfo?.phone) {
 			window.open(`https://wa.me/${task.clientInfo.phone.replace(/\D/g, '')}`)
 		}
 		addActionLog(task.id, {
 			action: 'Отправлено сообщение клиенту',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 		})
 	}
@@ -261,7 +269,7 @@ export default function FunnelTaskDetailPage() {
 		updateTask(task.id, { status })
 		addActionLog(task.id, {
 			action: `Изменен статус на "${statusLabels[status]}"`,
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 			details: `${task.status} -> ${status}`,
 		})
@@ -274,7 +282,7 @@ export default function FunnelTaskDetailPage() {
 		})
 		addActionLog(task.id, {
 			action: 'Сделка переведена в отказ',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 			details: comment,
 		})
@@ -284,7 +292,7 @@ export default function FunnelTaskDetailPage() {
 		updateTask(task.id, { statusFlags: flag })
 		addActionLog(task.id, {
 			action: 'Установлен флажок статуса',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 			details: flag?.type || 'none',
 		})
@@ -298,16 +306,18 @@ export default function FunnelTaskDetailPage() {
 		})
 		addActionLog(task.id, {
 			action: isPersonal ? 'Добавлена личная заметка' : 'Добавлена заметка',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 		})
 	}
 
-	const handleAddReminderAction = (reminder: Omit<NonNullable<Task['reminders']>[0], 'id'>) => {
+	const handleAddReminderAction = (
+		reminder: Omit<NonNullable<Task['reminders']>[0], 'id'>,
+	) => {
 		addReminder(task.id, reminder)
 		addActionLog(task.id, {
 			action: 'Добавлено напоминание',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 			details: `${reminder.title} на ${reminder.date} ${reminder.time}`,
 		})
@@ -321,7 +331,7 @@ export default function FunnelTaskDetailPage() {
 				action: reminder.completed
 					? 'Напоминание активировано'
 					: 'Напоминание выполнено',
-				userId: currentUser,
+				userId: currentUserId,
 				userName: currentUserName,
 			})
 		}
@@ -330,12 +340,12 @@ export default function FunnelTaskDetailPage() {
 	const handleSendInternalMessage = (text: string) => {
 		addInternalMessage(task.id, {
 			text,
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 		})
 		addActionLog(task.id, {
 			action: 'Отправлено сообщение в чат',
-			userId: currentUser,
+			userId: currentUserId,
 			userName: currentUserName,
 		})
 	}
@@ -447,7 +457,9 @@ export default function FunnelTaskDetailPage() {
 																{msg.userName || 'Менеджер'} (CRM)
 															</p>
 														)}
-														<p className='text-sm whitespace-pre-wrap'>{msg.text}</p>
+														<p className='text-sm whitespace-pre-wrap'>
+															{msg.text}
+														</p>
 														<p
 															className={cn(
 																'text-[10px] mt-1',
@@ -516,7 +528,9 @@ export default function FunnelTaskDetailPage() {
 						{task.clientInfo && (
 							<Card className='flex-shrink-0'>
 								<CardHeader className='py-3'>
-									<CardTitle className='text-base'>Информация о клиенте</CardTitle>
+									<CardTitle className='text-base'>
+										Информация о клиенте
+									</CardTitle>
 								</CardHeader>
 								<CardContent className='space-y-3'>
 									<div>
@@ -562,38 +576,45 @@ export default function FunnelTaskDetailPage() {
 														'bg-slate-100 text-slate-700 border-slate-200',
 												)}
 											>
-												{clientStatusLabels[task.clientStatus] || task.clientStatus}
+												{clientStatusLabels[task.clientStatus] ||
+													task.clientStatus}
 											</span>
 										</div>
 									)}
-									{task.interactionHistory && task.interactionHistory.length > 0 && (
-										<div>
-											<p className='text-xs font-medium text-muted-foreground mb-2'>
-												История взаимодействий ({task.interactionHistory.length})
-											</p>
-											<div className='space-y-1.5 max-h-32 overflow-y-auto shadcn-scrollbar'>
-												{task.interactionHistory.map(ih => (
-													<div
-														key={ih.id}
-														className='p-2 rounded border bg-muted/30 text-xs'
-													>
-														<div className='flex items-center justify-between mb-1'>
-															<span className='font-medium'>{ih.type}</span>
-															<span className='text-[10px] text-muted-foreground'>
-																{new Date(ih.date).toLocaleDateString('ru-RU')}
-															</span>
-														</div>
-														<p className='text-[10px] text-slate-600'>{ih.description}</p>
-														{ih.manager && (
-															<p className='text-[10px] text-muted-foreground mt-1'>
-																{ih.manager}
+									{task.interactionHistory &&
+										task.interactionHistory.length > 0 && (
+											<div>
+												<p className='text-xs font-medium text-muted-foreground mb-2'>
+													История взаимодействий (
+													{task.interactionHistory.length})
+												</p>
+												<div className='space-y-1.5 max-h-32 overflow-y-auto shadcn-scrollbar'>
+													{task.interactionHistory.map(ih => (
+														<div
+															key={ih.id}
+															className='p-2 rounded border bg-muted/30 text-xs'
+														>
+															<div className='flex items-center justify-between mb-1'>
+																<span className='font-medium'>{ih.type}</span>
+																<span className='text-[10px] text-muted-foreground'>
+																	{new Date(ih.date).toLocaleDateString(
+																		'ru-RU',
+																	)}
+																</span>
+															</div>
+															<p className='text-[10px] text-slate-600'>
+																{ih.description}
 															</p>
-														)}
-													</div>
-												))}
+															{ih.manager && (
+																<p className='text-[10px] text-muted-foreground mt-1'>
+																	{ih.manager}
+																</p>
+															)}
+														</div>
+													))}
+												</div>
 											</div>
-										</div>
-									)}
+										)}
 								</CardContent>
 							</Card>
 						)}
@@ -659,7 +680,9 @@ export default function FunnelTaskDetailPage() {
 
 						<Card className='flex-shrink-0'>
 							<CardHeader className='py-3'>
-								<CardTitle className='text-base'>Детальная информация</CardTitle>
+								<CardTitle className='text-base'>
+									Детальная информация
+								</CardTitle>
 							</CardHeader>
 							<CardContent className='space-y-4'>
 								{task.description && (
@@ -695,7 +718,8 @@ export default function FunnelTaskDetailPage() {
 									<div className='flex items-center gap-2'>
 										<CheckSquare className='h-4 w-4 text-muted-foreground' />
 										<span className='text-sm'>
-											Чек-лист: {task.checklist.filter(c => c.done).length} / {task.checklist.length}
+											Чек-лист: {task.checklist.filter(c => c.done).length} /{' '}
+											{task.checklist.length}
 										</span>
 									</div>
 									{task.checklist.length > 0 && (
@@ -704,7 +728,9 @@ export default function FunnelTaskDetailPage() {
 												<li
 													key={item.id}
 													className='flex items-center gap-2 text-sm cursor-pointer'
-													onClick={() => toggleChecklistItem(task.id, item.id, !item.done)}
+													onClick={() =>
+														toggleChecklistItem(task.id, item.id, !item.done)
+													}
 												>
 													<span
 														className={cn(
@@ -714,7 +740,9 @@ export default function FunnelTaskDetailPage() {
 																: 'border-slate-300 bg-background',
 														)}
 													>
-														{item.done ? <Check className='h-2.5 w-2.5' strokeWidth={3} /> : null}
+														{item.done ? (
+															<Check className='h-2.5 w-2.5' strokeWidth={3} />
+														) : null}
 													</span>
 													<span
 														className={cn(
@@ -742,7 +770,9 @@ export default function FunnelTaskDetailPage() {
 
 						<Card className='flex-shrink-0'>
 							<CardHeader className='py-3'>
-								<CardTitle className='text-base'>Информация о продаже</CardTitle>
+								<CardTitle className='text-base'>
+									Информация о продаже
+								</CardTitle>
 							</CardHeader>
 							<CardContent className='space-y-4'>
 								<div>
@@ -812,7 +842,9 @@ export default function FunnelTaskDetailPage() {
 												</Select>
 												<Input
 													type='number'
-													placeholder={discountType === 'percent' ? '0-100' : '0'}
+													placeholder={
+														discountType === 'percent' ? '0-100' : '0'
+													}
 													value={discountValue}
 													onChange={e => setDiscountValue(e.target.value)}
 													className='h-8 text-xs'
@@ -824,7 +856,9 @@ export default function FunnelTaskDetailPage() {
 													size='sm'
 													className='h-8 text-xs'
 													onClick={handleSaveDiscount}
-													disabled={!discountValue || parseFloat(discountValue) < 0}
+													disabled={
+														!discountValue || parseFloat(discountValue) < 0
+													}
 												>
 													Сохранить
 												</Button>

@@ -220,8 +220,7 @@ export function GlobalSearch() {
 	// Переход на страницу "Показать все результаты"
 	const handleShowAll = (searchQuery: string) => {
 		setIsOpen(false)
-		setQuery('') // Очищаем поле (опционально)
-		// ⚠️ ВАЖНО: Используем параметр 'q', так как страница результатов ожидает searchParams.get('q')
+		setQuery('')
 		navigate(`/search?q=${encodeURIComponent(searchQuery)}`)
 	}
 
@@ -233,11 +232,11 @@ export function GlobalSearch() {
 		}
 		setQuery('')
 		setIsOpen(false)
-		// Пример навигации на детальную страницу
+
 		navigate(`/details/${item.category}/${item.id}`)
 	}
 
-	// Навигация внутри Input (Стрелки + Enter)
+	// Навигация внутри Input
 	const handleInputKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'ArrowDown') {
 			e.preventDefault()
@@ -248,10 +247,8 @@ export function GlobalSearch() {
 		} else if (e.key === 'Enter') {
 			e.preventDefault()
 			if (selectedIndex >= 0 && flatList[selectedIndex]) {
-				// Если выбран элемент из списка -> переходим к нему
 				handleSelect(flatList[selectedIndex])
 			} else if (query) {
-				// Если просто введен текст -> идем на страницу поиска
 				handleShowAll(query)
 			}
 		}

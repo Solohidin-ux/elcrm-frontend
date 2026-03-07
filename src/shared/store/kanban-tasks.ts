@@ -44,7 +44,7 @@ export const useKanbanTasksStore = create<KanbanTasksState>(set => ({
 		})),
 	addTask: taskPayload =>
 		set(state => {
-			const newId = String(Date.now())
+			const newId = String(crypto.randomUUID())
 			const newTask: Task = {
 				...taskPayload,
 				id: newId,
@@ -79,7 +79,7 @@ export const useKanbanTasksStore = create<KanbanTasksState>(set => ({
 								...(t.notes || []),
 								{
 									...notePayload,
-									id: `note-${Date.now()}`,
+									id: `note-${crypto.randomUUID()}`,
 									createdAt: new Date().toISOString(),
 								},
 							],
@@ -97,7 +97,7 @@ export const useKanbanTasksStore = create<KanbanTasksState>(set => ({
 								...(t.reminders || []),
 								{
 									...reminderPayload,
-									id: `reminder-${Date.now()}`,
+									id: `reminder-${crypto.randomUUID()}`,
 								},
 							],
 						}
@@ -127,7 +127,7 @@ export const useKanbanTasksStore = create<KanbanTasksState>(set => ({
 								...(t.internalMessages || []),
 								{
 									...messagePayload,
-									id: `msg-${Date.now()}`,
+									id: `msg-${crypto.randomUUID()}`,
 									createdAt: new Date().toISOString(),
 								},
 							],
@@ -145,7 +145,7 @@ export const useKanbanTasksStore = create<KanbanTasksState>(set => ({
 								...(t.actionLogs || []),
 								{
 									...logPayload,
-									id: `log-${Date.now()}`,
+									id: `log-${crypto.randomUUID()}`,
 									timestamp: new Date().toISOString(),
 								},
 							],
@@ -162,7 +162,7 @@ export const useKanbanTasksStore = create<KanbanTasksState>(set => ({
 							todoList: [
 								...(t.todoList || []),
 								{
-									id: `todo-${Date.now()}`,
+									id: `todo-${crypto.randomUUID()}`,
 									text: text.trim(),
 									done: false,
 								},

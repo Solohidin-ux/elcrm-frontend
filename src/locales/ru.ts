@@ -15,12 +15,20 @@ export const ru = {
 
 	// Kanban
 	kanban: {
+		addTask: 'Добавить задачу',
+
 		columns: {
 			new: 'Новый',
 			contacted: 'Связались',
 			agreed: 'Договорились',
 			bought: 'Купил',
 			refused: 'Отказ',
+		},
+
+		toasts: {
+			updatedStatus: 'Статус обновлен',
+			taskMoved:
+				'Задача "{{taskTitle}}" была перемещена из "{{initialStatusTitle}}" в "{{currentStatusTitle}}"',
 		},
 	},
 

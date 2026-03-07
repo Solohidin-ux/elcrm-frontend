@@ -1,5 +1,14 @@
 import { create } from 'zustand'
 import type { Client, ClientActionLog, ClientStatus } from '../types/client'
+import { useAuthStore } from './auth-store'
+
+const getCurrentUser = () => {
+	const user = useAuthStore.getState().user
+	return {
+		userId: user?.id ?? 'unknown',
+		userName: user?.name ?? 'Неизвестный пользователь',
+	}
+}
 
 // Мок-данные для начального состояния
 const initialClients: Client[] = [
@@ -172,11 +181,6 @@ interface ClientsState {
 	getClientById: (clientId: string) => Client | undefined
 }
 
-const getCurrentUser = () => ({
-	userId: 'current-user',
-	userName: 'Текущий пользователь',
-})
-
 // Вспомогательная функция фильтрации
 function applyFiltersToClients(
 	clients: Client[],
@@ -223,7 +227,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 	addClient: clientPayload => {
 		const now = new Date().toISOString()
 		const { userId, userName } = getCurrentUser()
-		const newId = `USR-${Date.now()}`
+		const newId = `USR-${crypto.randomUUID()}`
 
 		const newClient: Client = {
 			...clientPayload,
@@ -232,7 +236,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 			updatedAt: now,
 			actionLogs: [
 				{
-					id: `log-${Date.now()}`,
+					id: `log-${crypto.randomUUID()}`,
 					action: 'Клиент создан',
 					userId,
 					userName,
@@ -273,7 +277,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 							archived: 'Архив',
 						}
 						newLogs.push({
-							id: `log-${Date.now()}`,
+							id: `log-${crypto.randomUUID()}`,
 							action: `Статус изменен на "${statusLabels[updates.status]}"`,
 							userId,
 							userName,
@@ -285,7 +289,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 					// Добавляем лог при изменении менеджера
 					if (updates.managerId && updates.managerId !== client.managerId) {
 						newLogs.push({
-							id: `log-${Date.now() + 1}`,
+							id: `log-${crypto.randomUUID()}`,
 							action: `Назначен менеджер: ${updates.managerName || 'Не назначен'}`,
 							userId,
 							userName,
@@ -347,7 +351,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 						actionLogs: [
 							...client.actionLogs,
 							{
-								id: `log-${Date.now()}`,
+								id: `log-${crypto.randomUUID()}`,
 								action: 'Клиент перемещен в архив',
 								userId,
 								userName,
@@ -386,7 +390,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 						actionLogs: [
 							...client.actionLogs,
 							{
-								id: `log-${Date.now()}`,
+								id: `log-${crypto.randomUUID()}`,
 								action: 'Клиент восстановлен из архива',
 								userId,
 								userName,
@@ -467,7 +471,7 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
 								...client.actionLogs,
 								{
 									...logPayload,
-									id: `log-${Date.now()}`,
+									id: `log-${crypto.randomUUID()}`,
 									timestamp: new Date().toISOString(),
 								},
 							],
