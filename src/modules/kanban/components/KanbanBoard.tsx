@@ -1,3 +1,4 @@
+import { useKanbanTasksStore } from '@/shared/store/kanban-tasks'
 import {
 	closestCorners,
 	defaultDropAnimationSideEffects,
@@ -16,18 +17,20 @@ import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { useKanbanTasksStore } from '@/shared/store/kanban-tasks'
 import {
 	getInitialColumns,
 	type ColumnType,
 	type Task,
 } from '../../../shared/utils/moc-data.ts'
 import KanbanColumnContainer from './KanbanColumnContainer.tsx'
+import KanbanEditTask from './KanbanEditTask.tsx'
 import KanbanTaskCard from './KanbanTaskCard.tsx'
 
 function KanbanBoard() {
 	const { t } = useTranslation()
-	const { tasks, setTasks, toggleChecklistItem } = useKanbanTasksStore()
+	const { tasks, setTasks, toggleChecklistItem, updateTask } =
+		useKanbanTasksStore()
+	const [editingTask, setEditingTask] = useState<Task | null>(null)
 
 	const columns = useMemo(() => getInitialColumns(t), [t])
 
@@ -103,15 +106,25 @@ function KanbanBoard() {
 			initialTask &&
 			currentTask.status !== initialTask.status
 		) {
-			console.log(
-				`[STATUS CHANGED] Task "${currentTask.title}" moved from "${initialTask.status}" to "${currentTask.status}"`,
-				currentTask,
-			)
-			toast.success('Изменение статуса', {
-				description: `Task "${currentTask.title}" moved from "${initialTask.status}" to "${currentTask.status}"`,
-				position: 'top-center',
-				descriptionClassName: '!text-black font-medium',
-				duration: 10000,
+			let currentStatusTitle = columns.find(
+				c => c.id === currentTask.status,
+			)?.title
+
+			let initialStatusTitle = columns.find(
+				c => c.id === initialTask.status,
+			)?.title
+
+			let taskTitle = currentTask.title
+
+			toast.success(t('kanban.toasts.updatedStatus'), {
+				description: t('kanban.toasts.taskMoved', {
+					taskTitle,
+					initialStatusTitle,
+					currentStatusTitle,
+				}),
+				position: 'bottom-right',
+				closeButton: true,
+				duration: 2000,
 			})
 		}
 
@@ -165,6 +178,7 @@ function KanbanBoard() {
 							column={col}
 							tasks={tasks.filter(t => t.status === col.id)}
 							onChecklistToggle={toggleChecklistItem}
+							onEdit={setEditingTask}
 						/>
 					))}
 				</div>
@@ -173,6 +187,13 @@ function KanbanBoard() {
 					{activeTask ? <KanbanTaskCard task={activeTask} isOverlay /> : null}
 				</DragOverlay>
 			</DndContext>
+
+			<KanbanEditTask
+				task={editingTask}
+				open={!!editingTask}
+				onOpenChange={open => !open && setEditingTask(null)}
+				onSave={updateTask}
+			/>
 		</div>
 	)
 

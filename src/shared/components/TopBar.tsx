@@ -13,7 +13,11 @@ import usFlagIcon from '@/shared/icons/united-states-flag.png'
 import { Check, Globe, LogOut, Settings, User } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { UrlNames } from '../enums/UrlNames'
+
+import { useAuthStore } from '../store/auth-store'
 import { ActionBtn } from './ActionBtn'
 import GlobalSearch from './GlobalSearch'
 import Notifications from './Notifications'
@@ -56,7 +60,10 @@ const languages = [
 
 function TopBar() {
 	const [currentLang, setCurrentLang] = useState(languages[0])
-	const { t, i18n } = useTranslation()
+	const { i18n } = useTranslation()
+	const navigate = useNavigate()
+	const logout = useAuthStore(state => state.logout)
+	const user = useAuthStore(state => state.user)
 
 	const handleLanguageChange = (langCode: string) => {
 		i18n.changeLanguage(langCode)
@@ -64,6 +71,16 @@ function TopBar() {
 			languages.find(lang => lang.code === langCode) || languages[0],
 		)
 	}
+
+	const handleLogout = () => {
+		logout()
+		toast.success('Вы вышли из системы')
+		navigate(UrlNames.LOGIN)
+	}
+
+	const displayName = user?.name || 'Admin'
+	const displayEmail = user?.email || 'admin@gmail.com'
+	const userInitial = displayName.charAt(0).toUpperCase()
 
 	return (
 		<header className='w-full h-20 bg-background border-b border-border flex items-center justify-between px-6 py-2 shadow-sm z-50 relative'>
@@ -117,13 +134,13 @@ function TopBar() {
 							<button className='flex items-center gap-3 hover:opacity-80 transition-opacity outline-none text-left'>
 								<Avatar className='h-11 w-11 bg-primary'>
 									<AvatarFallback className='bg-primary text-primary-foreground font-medium text-lg'>
-										A
+										{userInitial}
 									</AvatarFallback>
 								</Avatar>
 								<div className='flex flex-col leading-tight'>
-									<span className='text-sm font-semibold'>Admin</span>
+									<span className='text-sm font-semibold'>{displayName}</span>
 									<span className='text-xs text-muted-foreground'>
-										admin@gmail.com
+										{displayEmail}
 									</span>
 								</div>
 							</button>
@@ -133,10 +150,10 @@ function TopBar() {
 							<DropdownMenuLabel className='font-normal'>
 								<div className='flex flex-col space-y-1'>
 									<p className='text-sm font-medium leading-none'>
-										Admin Profile
+										{displayName}
 									</p>
 									<p className='text-xs leading-none text-muted-foreground'>
-										admin@gmail.com
+										{displayEmail}
 									</p>
 								</div>
 							</DropdownMenuLabel>
@@ -152,7 +169,10 @@ function TopBar() {
 								</DropdownMenuItem>
 							</NavLink>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem className='text-red-600 focus:text-red-600 cursor-pointer focus:bg-red-50'>
+							<DropdownMenuItem
+								className='text-red-600 focus:text-red-600 cursor-pointer focus:bg-red-50'
+								onClick={handleLogout}
+							>
 								<LogOut className='mr-2 h-4 w-4' />
 								<span>Выйти</span>
 							</DropdownMenuItem>

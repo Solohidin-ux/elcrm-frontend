@@ -14,9 +14,10 @@ interface KanbanColumnContainerProps {
 	column: Column
 	tasks: Task[]
 	onChecklistToggle: (taskId: Task['id'], itemId: ChecklistItemId, done: boolean) => void
+	onEdit?: (task: Task) => void
 }
 
-function KanbanColumnContainer({ column, tasks, onChecklistToggle }: KanbanColumnContainerProps) {
+function KanbanColumnContainer({ column, tasks, onChecklistToggle, onEdit }: KanbanColumnContainerProps) {
 	const { setNodeRef } = useSortable({
 		id: column.id,
 		data: {
@@ -55,6 +56,7 @@ function KanbanColumnContainer({ column, tasks, onChecklistToggle }: KanbanColum
 							key={task.id}
 							task={task}
 							onChecklistToggle={onChecklistToggle}
+							onEdit={onEdit}
 						/>
 					))}
 				</SortableContext>

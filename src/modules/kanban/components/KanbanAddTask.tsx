@@ -18,9 +18,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import type { ChecklistItem, ColumnType, Task } from '@/shared/utils/moc-data'
 import { CheckSquare, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import type { ChecklistItem, ColumnType, Task } from '@/shared/utils/moc-data'
+import { useTranslation } from 'react-i18next'
 
 interface KanbanAddTaskProps {
 	onAddTask: (task: Omit<Task, 'id'>) => void
@@ -31,10 +32,12 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 	const [title, setTitle] = useState('')
 	const [budget, setBudget] = useState('')
 	const [priority, setPriority] = useState<Task['priority']>('medium')
-	const [status, setStatus] = useState<ColumnType>('planned')
+	const [status, setStatus] = useState<ColumnType>('new')
 	const [description, setDescription] = useState('')
 	const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([])
 	const [newItemText, setNewItemText] = useState('')
+
+	const { t } = useTranslation()
 
 	const addChecklistItem = () => {
 		const text = newItemText.trim()
@@ -78,7 +81,7 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 		setTitle('')
 		setBudget('')
 		setPriority('medium')
-		setStatus('planned')
+		setStatus('new')
 		setDescription('')
 		setChecklistItems([])
 		setNewItemText('')
@@ -89,7 +92,7 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 			setTitle('')
 			setBudget('')
 			setPriority('medium')
-			setStatus('planned')
+			setStatus('new')
 			setDescription('')
 			setChecklistItems([])
 			setNewItemText('')
@@ -102,7 +105,7 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 			<DialogTrigger asChild>
 				<button className='flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors shadow-sm cursor-pointer'>
 					<Plus size={16} />
-					Новая задача
+					{t('kanban.addTask')}
 				</button>
 			</DialogTrigger>
 
@@ -157,15 +160,20 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 						</div>
 						<div className='flex flex-col gap-2'>
 							<Label>Статус</Label>
-							<Select value={status} onValueChange={v => setStatus(v as ColumnType)}>
+							<Select
+								value={status}
+								onValueChange={v => setStatus(v as ColumnType)}
+							>
 								<SelectTrigger className='w-full'>
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
 									<SelectGroup>
-										<SelectItem value='planned'>В планах</SelectItem>
-										<SelectItem value='in_progress'>В работе</SelectItem>
-										<SelectItem value='done'>Готово</SelectItem>
+										<SelectItem value='new'>Новый</SelectItem>
+										<SelectItem value='contacted'>Связались</SelectItem>
+										<SelectItem value='agreed'>Договорились</SelectItem>
+										<SelectItem value='bought'>Купил</SelectItem>
+										<SelectItem value='refused'>Отказ</SelectItem>
 									</SelectGroup>
 								</SelectContent>
 							</Select>
@@ -238,7 +246,11 @@ function KanbanAddTask({ onAddTask }: KanbanAddTaskProps) {
 				</div>
 
 				<DialogFooter>
-					<Button type='button' variant='outline' onClick={() => setOpen(false)}>
+					<Button
+						type='button'
+						variant='outline'
+						onClick={() => setOpen(false)}
+					>
 						Отмена
 					</Button>
 					<Button type='button' onClick={handleSubmit}>
