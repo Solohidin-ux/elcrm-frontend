@@ -189,3 +189,7 @@
 * {
 	font-family: 'Open Sans', sans-serif !important;
 }
+
+button {
+	cursor: pointer;
+}

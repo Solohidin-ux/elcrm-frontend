@@ -4,11 +4,11 @@ import DashboardManagerPage from './DashboardManagerPage'
 import DashboardOwnerPage from './DashboardOwnerPage'
 
 export default function DashboardPage() {
-	const [role, setRole] = useState<'owner' | 'manager'>('manager')
+	const [role] = useState<'owner' | 'manager'>('manager')
 
 	return (
 		<Layout className='p-4'>
-			{role === 'owner' ? <DashboardOwnerPage /> : <DashboardManagerPage />}
+			{role === 'manager' ? <DashboardOwnerPage /> : <DashboardManagerPage />}
 		</Layout>
 	)
 }

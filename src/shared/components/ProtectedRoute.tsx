@@ -1,14 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom'
-import { UrlNames } from '../enums/UrlNames'
+import { Outlet } from 'react-router-dom'
+import { useAuthStore } from '../store/auth-store'
 
 export default function ProtectedRoute() {
-	// Проверяем наличие токена в localStorage
-	// const access = localStorage.getItem('access')
-	const access = true
+	const accessToken = useAuthStore(s => s.accessToken)
 
-	if (!access) {
-		return <Navigate to={UrlNames.LOGIN} replace />
-	}
+	// if (!accessToken) {
+	// 	return <Navigate to={UrlNames.LOGIN} replace />
+	// }
 
 	// Иначе рендерим дочерние маршруты
 	return <Outlet />

@@ -115,13 +115,13 @@ export default function FunnelTaskDetailPage() {
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
 	const whatsappMessages = useMemo(
-		() => taskChatMessages[taskId] ?? [],
+		() => taskChatMessages[taskId as string] ?? [],
 		[taskId],
 	)
 
 	// Объединяем WhatsApp сообщения и внутренние сообщения CRM
 	const allMessages = useMemo(() => {
-		const whatsapp = whatsappMessages.map(msg => ({
+		const whatsapp = whatsappMessages.map((msg: any) => ({
 			...msg,
 			type: 'whatsapp' as const,
 			timestamp: msg.timestamp,

@@ -1,65 +1,47 @@
 import { create } from 'zustand'
-
-export interface User {
-	id: string
-	name: string
-	email: string
-	avatar?: string
-	role: 'manager' | 'owner' | 'admin'
-}
+import { persist } from 'zustand/middleware'
 
 interface AuthState {
-	user: User | null
-	isAuthenticated: boolean
-	isLoading: boolean
-
-	login: (email: string, password: string) => Promise<void>
+	accessToken: string | null
+	refreshToken: string | null
+	user: { id: string; name: string; email: string } | null
+	setTokens: (access: string, refresh: string, user?: AuthState['user']) => void
 	logout: () => void
-	fetchMe: () => Promise<void>
+	setUser: (user: AuthState['user']) => void
 }
 
-const mockUsers: Record<string, User> = {
-	'manager@example.com': {
-		id: 'mgr-001',
-		name: 'Иван Петров',
-		email: 'manager@example.com',
-		role: 'manager',
-	},
-	'owner@example.com': {
-		id: 'own-001',
-		name: 'Алексей Смирнов',
-		email: 'owner@example.com',
-		role: 'owner',
-	},
-}
-
-export const useAuthStore = create<AuthState>((set, get) => ({
-	user: null,
-	isAuthenticated: false,
-	isLoading: false,
-
-	login: async (email: string, password: string) => {
-		set({ isLoading: true })
-		const user = mockUsers[email.toLowerCase()]
-
-		if (user && password === 'password') {
-			set({ user, isAuthenticated: true, isLoading: false })
-		} else {
-			set({ isLoading: false })
-			throw new Error('Invalid credentials')
-		}
-	},
-
-	logout: () => {
-		set({ user: null, isAuthenticated: false })
-	},
-
-	fetchMe: async () => {
-		set({ isLoading: true })
-
-		await new Promise(resolve => setTimeout(resolve, 500))
-
-		const user = mockUsers['manager@example.com']
-		set({ user, isAuthenticated: !!user, isLoading: false })
-	},
-}))
+export const useAuthStore = create<AuthState>()(
+	persist(
+		set => ({
+			accessToken: null,
+			refreshToken: null,
+			user: null,
+			setTokens: (access, refresh, user) => {
+				localStorage.setItem('access', access)
+				localStorage.setItem('refresh', refresh)
+				set({ accessToken: access, refreshToken: refresh })
+				if (user) {
+					localStorage.setItem('user', JSON.stringify(user))
+					set({ user })
+				}
+			},
+			logout: () => {
+				localStorage.removeItem('access')
+				localStorage.removeItem('refresh')
+				localStorage.removeItem('user')
+				set({ accessToken: null, refreshToken: null, user: null })
+			},
+			setUser: user => {
+				if (user) {
+					localStorage.setItem('user', JSON.stringify(user))
+				} else {
+					localStorage.removeItem('user')
+				}
+				set({ user })
+			},
+		}),
+		{
+			name: 'auth-storage',
+		},
+	),
+)
