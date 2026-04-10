@@ -28,6 +28,7 @@ function App() {
 
 				<Route path='/settings' element={<SettingsPage />} />
 				<Route path={UrlNames.SEARCH} element={<SearchResultsPage />} />
+				<Route path='/test' element={<h1>Тестовая страница</h1>} />
 
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Route>
