@@ -21,11 +21,6 @@ function App() {
 
 				<Route path={UrlNames.LOGIN} element={<LoginPage />} />
 
-<<<<<<< HEAD
-				<Route path='/settings' element={<SettingsPage />} />
-				<Route path={UrlNames.SEARCH} element={<SearchResultsPage />} />
-				<Route path='/test' element={<h1>Тестовая страница</h1>} />
-=======
 				{/* Защищенные маршруты */}
 				<Route element={<ProtectedRoute />}>
 					<Route path={UrlNames.DASHBOARD} element={<DashboardPage />} />
@@ -42,7 +37,6 @@ function App() {
 					<Route path='/settings' element={<SettingsPage />} />
 					<Route path={UrlNames.SEARCH} element={<SearchResultsPage />} />
 				</Route>
->>>>>>> f97a9333e6bd0db4cd4ce5e64ba47cddf256ad68
 
 				<Route path='*' element={<Navigate to='/' replace />} />
 			</Route>
